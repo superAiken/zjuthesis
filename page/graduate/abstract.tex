@@ -1,5 +1,71 @@
-\cleardoublepage
+% \let\cleardoublepage\clearpage
 \chapternonum{摘要}
+% 无创电生理成像中重建心脏跨膜电位(Transmembrane Potential,TMP)在临床上有着巨大的作用，因为TMP可以作为医生定位和
+% 诊断心脏异位起搏和心肌梗死的重要工具。重建TMP是病态的逆问题，所以要充分结合TMP的动态激活模型和
+% TMP的正向模型才能融入更多的生理先验信息。
+% 从体表电位(Body Surface Potential,BSP)重建出心肌细胞跨膜电位
+% (Transmembrane Potential,TMP)对无创诊断心脏疾病有重要作用。
+% TMP重建可以作为医生定位和
+% 诊断心脏异位起搏和心肌梗死的重要工具。
+% 但是目前大多数重建TMP的算法
+% 都是根据TMP到BSP的正向模型设计的，忽略了TMP在心肌细胞上的动态激活过程，使重建精度受限。
+从体表电位(Body Surface Potential，BSP)重建出心肌细胞跨膜电位
+(Transmembrane Potential，TMP)对无创诊断心脏疾病有重要作用。
+TMP重建是典型的逆问题，为了得到唯一解，需要加上约束项。目前多数约束项是从数学角度进行设计，而忽略了心脏的电生理特性。
+
+本文提出一个基于生理模型的深度学习框架，该模型可以学习TMP的动态激活过程，从而加入生理约束。我们的卡尔曼滤波网络( Kalman Filtering
+Network，KFNet)是由两个部分构成，首先状态转移网络(State Sapce Transfer Network，SSNet)引入循环神经网络，
+将双变量方程构建的TMP动态激活模型和BSP-TMP的正向模型集成起来，得到先验估计的TMP。
+卡尔曼增益网络(Kalman Gain Network，KFGNet)通过卷积神经网络学习卡尔曼增益系数，解决了在传统卡尔曼滤波算法重建TMP中
+噪声矩阵调节困难的问题。最后通过卡尔曼更新得到最后TMP的后验估计。
+通过多组仿真数据实验，在心脏异位起搏定位任务和心肌梗死区域重建任务中，证明了方法的有效性。
+
+然后，为了进一步提升重建精度，本文在基于生理模型的深度学习框架的基础上加入图注意力(Graph Attention，GA)模块。图卷
+积神经网络可以学习心脏的几何信息，然后，基于注意力机制学习每个心脏节点的权重，使模型更加关注心脏病变区域。最后通过实验验证，证明了
+加入图注意力模块的有效性。
+% 首先，本篇文章提出了一种基于卡尔曼滤波算法的深度学框架重建TMP，它通过卡尔曼滤波算法将TMP的动态激活模型和TMP的正向模型充分结合。
+% 本文在传统的卡尔曼滤波算法上提出了两点改进：1、本文通过引入
+% 循环神经网络解决了个性化的生理参数问题；2、本文提出通过卷积神经网络学习卡尔曼增益系数，
+% 解决了人工调节噪声矩阵的难点。本文将提出的算法与目前重建TMP的算法在异位起搏实验、
+% 心肌梗死实验和激活时间重建
+% 实验上进行了对比，结果显示我们提出的算法重建精度更高。
+
+% 然后，本文在基于卡尔曼滤波的深度学习框架上进一步提出了基于图注意力机制模块去提升算法的
+% 重建精度。本文使用图卷积将心脏的几何空间信息增加到网络中，给网络添加了更多的先验信息。
+% 同时，本文借鉴了注意力机制的原理，将状态转移网络中每个心脏节点的特征通过图卷积学习出各自的权重，再通过注意力机制
+% 进行特征融合，
+% 以此提升算法的重建能力。本文将提出的模块在模拟数据上进行了实验，结果表明本文提出的图注意力机制模块可以提升重建TMP的精度。
+
+\textbf{关键词：心脏跨膜电位、卡尔曼滤波、循环神经网络、图卷积、注意力机制}
 
 \cleardoublepage
 \chapternonum{Abstract}
+
+Recovering cardiac transmembrane potential (TMP) 
+from Body Surface Potential (BSP) plays an important role in the non-invasive diagnosis of heart disease.
+Recovering TMP is a typical inverse problem. In order to obtain a unique solution, 
+constraint terms need to be added. At present, most constraints are designed from a mathematical point of view, 
+ignoring the electrophysiological characteristics of the heart.
+
+
+
+This paper proposes a deep learning framework based on a physiological model, which can learn the dynamic 
+activation process of TMP and thus add physiological constraints.
+Firstly, the dynamic TMP activation model is established by introducing a two-variable model, 
+and the physiological model is established jointly with the forward TMP model.
+Kalman Filtering Network (KFNet) is composed of two parts. Firstly, State Sapce transfer Network (SSNet) 
+introduces recurrent neural network. The TMP dynamic activation model constructed by two-variable model and the 
+forward model of BSP-TMP were integrated to obtain a priori estimated TMP. Kalman Gain Network (KFGNet) 
+learns the Kalman gain coefficient by convolutional neural network, which solves the difficulty of adjusting 
+the noise matrix in the reconstructed TMP computed by traditional Kalman filter.
+Finally, a posteriori estimate of the final TMP is obtained by Kalman update. Through several sets of 
+simulation data experiments, the method is proved to be effective in ectopic pacing and myocardial infarction area reconstruction.
+
+Then, in order to further improve the reconstruction accuracy, Graph Attention (GA) module is added to the deep learning 
+framework based on physiological model. The graph convolutional neural network can learn the geometric information of the 
+heart, and then, based on the attention mechanism, learn the weight of each heart node to make the model pay more attention 
+to the diseased area of the heart. Finally, the effectiveness of adding graph attention module is proved by experiment.
+
+
+
+\textbf{Keywords: cardiac transmembrane potential, Kalman filter, recurrent neural network, graph convolution, attention mechanism}

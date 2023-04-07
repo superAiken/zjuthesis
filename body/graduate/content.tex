@@ -1,103 +1,2174 @@
-\chapter{关于本模板}
+\let\cleardoublepage\clearpage
+\chapter{绪论}
+\section{引言} 
+在过去的几十年里，心脏疾病是世界范围内引起死亡的主要原因之一。美国心脏协
+会(American Heart Association，AHA）2017年发表的一项最新研究表明，仅在美国，心血管疾病就导致了近80万人死亡
+，大概每三人死亡中就有一人死于心血管疾病\cite{benjamin2017heart}。而在我国，心血管疾病患者的
+数量也是急剧增加，甚至每年因为心血管疾病导致的死亡率超过癌症的死亡率。
+因此加强心脏疾病的诊断和治疗非常重要。
 
-本模板根据浙江大学研究生院编写的《浙江大学研究生学位论文编写规则》~\cite{zjugradthesisrules}，
-在原有的 zjuthesis 模板~\cite{zjuthesis}基础上开发而来。
+心电图通过测量体表电位(Body Surface Potential，BSP)\cite{wu1996body}间接呈现心脏疾病信息，是医生诊断心脏疾病的主要工具之一。
+医生通过对12导联心电图的观测\cite{algra1991qtc}，可大致判断患者心血管疾病的发病类型和发病位置。但这种判断是基于经验的，并不
+十分准确。其原因是BSP为心脏电生理活动的间接测量，而非直接观测。
+因此研究人员提出心脏电生理成像辅助医生
+诊断和治疗。心脏电生理成像可直接描述心脏电生理活动，相比于BSP，它更加直观地展示了心脏电生理信息。
+目前电生理成像\cite{dhamala2018high}(Electrophysiological imaging,ECGI)主要包含两种：1、有创电生理成像；2、无创电生理成像。
 
-本模板的本科生版本\cite{zjuthesisrules}得到了浙江大学本科生院老师的支持与审核，
-已经在本科生院网上公示。
-但当前的研究生版本并未经过研究生院老师的审核，
-同学们使用时要注意对照模板与要求，
-切不可盲目使用。
+有创电生理成像对人体伤害较大，主要应用在开胸手术中。因此为了病人的安全，
+无创的电生理成像方法成为近年来研究的重点\cite{ramanathan2004noninvasive,cluitmans2015noninvasive}。
+心肌跨膜电位(Transmembrane Potential,TMP)\cite{he2003noninvasive}是心脏细胞膜内外的电势差。
+TMP在诊断心肌梗死和心脏异位起搏上有着较大的优势，TMP
+可以根据电压的幅值显示出梗死的区域和起搏的位置\cite{paul2001atrial,carmeliet1978cardiac}。
+目前无创重建TMP的方法是基于BSP重构TMP。由于这个重建过程是从低维度到高维度，从矩阵论的角度可以得到无穷多
+解，是一个不适定的逆问题。
 
-作者本人并未编写过浙江大学研究生毕业论文，
-所以不清楚具体要求。
-如果有热心同学愿意帮忙，
-可以替我联系相关老师，我会配合审核并修改代码。
+为解决TMP重建中的病态逆问题，
+往往要结合先验信息。
+目前无创重建TMP的方法主要分为三大类：1、基于数学模型的迭代优化\cite{xie2019non,messnarz2004new,wang2009physiological}，
+2、基于数据驱动的深度学习方法\cite{ghimire2018deep,bacoyannis2019deep}；
+3、基于数学模型的深度学习方法\cite{xie2021lnista,mu2021cardiac}。基于数学模型的迭代优化主要可以分为两类：
+基于目标函数的正则化方法和基于时序融合的贝叶斯方法。这种方法存在人工定义参数和
+个体生理差异导致生理参数不同的问题。
+通过数据驱动的深度学习方法被广泛运用在医学图像的各个领域，特别是近年来逐渐被引入解决不适定的逆问题。尽管深度学习
+的方法在研究领域取得不错的效果，但是因为深度学习的方法是在大量数据的基础上学习出数据的潜在特征，
+这将要求大数量和高质量的数据，而收集数据是一个昂贵并且耗时较长的工作。两种方法都在解决逆
+问题的领域获得了巨大成功,但是都有各自的不足之处。第三种方法将深度
+学习与传统方法相结合，通过结合前两种方法的优势弥补各自的缺点。
 
-\section{Overleaf 使用注意事项}
+本文将从卡尔曼滤波出发利用心脏生理模型，充分结合TMP的动态激活模型和TMP的正向模型，
+并将卡尔曼滤波算法与深度学习相结合，解决卡尔曼滤波
+需要人工定义噪声矩阵和状态转移方程中因为个体差异导致的参数调节问题。论文进一步引入图注意力模块，
+在本文提出的算法中
+增加心脏的几何先验信息,
+最后将提出的算法在心脏
+异位起搏和心肌梗死等疾病上进行验证，进行相关的鲁棒性和泛化性分析，充分证明本文提出算法的优越性。
 
-如果你在Overleaf上编译本模板，请注意如下事项：
+\section{生理基础}
 
-\begin{itemize}
-    \item 删除根目录的 ``.latexmkrc'' 文件，否则编译失败且不报任何错误
-    \item 字体有版权所以本模板不能附带字体，请务必手动上传字体文件，并在各个专业模板下手动指定字体。
-        具体方法参照 GitHub 主页的说明。
-    \item 当前的Overleaf默认使用TexLive 2017进行编译，但一些伪粗体复制乱码的问题需要TexLive 2019版本来解决。
-        所以各位同学可以在Overleaf上编写论文时务必切换到TexLive 2019或更新版本来编译，以免产生查重相关问题。
-        具体说明参照 GitHub 主页。
-\end{itemize}
+\subsection{心电图}
+目前医生通常通过心电图机来测量心脏在每个跳动周期产生的电信号经躯干传导到体表的BSP\cite{morganroth1978limitations,tomavsic2013electrocardiographic}。
+心电图起源于十八世纪英国皇家学会在人和狗身上第一次通过
+毛细管静电计
+测得的心电信号。
+心电图是目前医生在判断心脏类疾病的主要技术手段之一，它可以作为人类
+心脏电生理活动
+的可视时间序列\cite{alghatrif2012brief}。
+
+心电图是一种非侵入性的方法，可以测量体表不同位置随时间变化的电位。
+\autoref{fig:qrs}展示了正常心电图信号。心电信号由以下主要部分组成：
+P波、PR段、QRS波群、ST段和T波\cite{simoons1975gradual}。心电图的不同部分对应于心脏电生理活动的
+不同阶段，可用于追踪心脏的特定异常电功能。例如，P波对应于心房去极化；PR
+对应于电激活通过房室结和Purkinjie纤维的传播，波形呈现为一条平缓的直线；QRS波对应于心室的去
+极化，由于心室的心肌细胞要多于心房的心肌细胞，因此QRS的电压幅值要高于P波，这个波段蕴含心脏的
+信息最多； ST段对应
+于所有心肌细胞保持在平台上且心室中所有区域处于去极化状态的阶段，一般是平缓的曲线，T波对应于
+心室的复极化\cite{becker2006fundamentals}。
+
+传统的心电图系统主要由三个电极组成，分别位于人体的左臂、右臂和左腿上
+，从中计算出三个肢体电压\(V_{I}\)、\(V_{II}\)和\(V_{III}\)。目前医生日常中经常使用的是12导联心电图，它包含
+六个附加电极，可提供六个附加测量值\(V_{1-6}\)。
+通常，标准的12导联心电图仅仅作为医生诊断的一个辅助工具，不能作为进一步作为诊断的依据，因为电极较少，
+包含的生理信息不足。体表电位标测技术(Body Surface Potential Mapping，BSPM)会在体表设置数十至数百个电极，
+记录体表的电位，获得比12导联心电图更丰富的生理信息。
+在本文中，主要使用64导联BSPM。
 
 
-\section{节标题}
-
-我们可以用includegraphics来插入现有的jpg等格式的图片，
-如\autoref{fig:zju-logo}所示。
-
-\begin{figure}[htbp]
+\begin{figure}
     \centering
-    \includegraphics[width=.3\linewidth]{logo/zju}
-    \caption{\label{fig:zju-logo}浙江大学LOGO}
+    \includegraphics[width=0.8\linewidth]{qrs.png}
+    \caption{\label{fig:pqstr}显示的人类心脏正常窦性心律的心电图}
+    \label{fig:qrs}
+\end{figure}
+
+\subsection{心脏跨膜电位}
+
+心脏电信号传播的本质是由于心脏细胞的细胞膜的Na离子、K离子和Ca离子等不同离子的离子
+通道的开合导致\cite{sundnes2007computing}。由于正负离子移动产生
+的跨细胞膜（细胞膜内和细胞膜外）的电势差，就是心肌细胞跨膜电位或作称为动作电位。这个电势差
+在静息电位时大概在-90mv左右，在足够大的电刺激下可以达到+30mv。TMP从完全激活状态到静息状态
+需要一段时间才可以达到，而从静息状态到完全激活状态时间非常短暂\cite{neunlist1995spatial}。
+
+当心肌细胞处于静息状态时，此时表现为Na离
+子的渗透性远小于K离子，这时TMP表现为负数（即膜内电位小于膜外电位），
+它的数值为-80毫伏到-95毫伏；接着进入快速去极化阶段，细胞受到刺激，Na
+离子通道开启，大量Na离子流入膜内，此时膜内电位大于膜外，产生动作电位，
+数值大小为10毫伏到30毫伏；随后TMP由正转负的阶段称为复极化，在缓慢复
+极化时，K离子外流直至膜内外正负离子基本趋于平衡，这时TMP基本表现为
+0毫伏，而后进入平台期，K离子、Ca离子和Na离子流动很少；最后Na离子快
+速外流进入快速复极化，TMP又重新回到静息电位，这就是单个自搏性心肌细
+胞的整个搏动周期内心脏跨膜电位变化的过程\cite{gussak2000rapid}。
+
+
+
+TMP一旦在心肌细胞中启动，就像在其他易兴奋细胞中一样，通过局部电流
+传播。正常情况下，窦房结的起搏器细胞开始激活，其特征是自兴奋性。也就是
+说，在起搏器细胞中，TMP自发上升，直到达到阈值并发生动作电位。由起搏器细
+胞激发的动作电位会刺激邻近的细胞，而这些细胞又会刺激邻近的细胞，因此兴奋在
+细胞间的扩散最初发生在心房。当这种兴奋到达房室节点，它将房室和心
+室分隔开来，活动仅通过房室节点到达心室。
+在心室区，浦肯野系统将脉冲迅速传导到左右心室的许多位置，在工作的心室
+肌中，进一步的传导在细胞间进行。心室去极化从室间隔左侧开始，扩散到室尖，然
+后到心室壁，最后到心室。
+
+TMP可以作为诊断心肌梗死\cite{chauhan2006increased,jackson2005borderzone}和
+心脏异位起搏\cite{xie2010so,qu2015mechanisms}等疾病的依据。
+心肌梗死和异位起搏都是常见的心脏疾病，临床上的治疗都需要疾病病灶区域的细节信息，比如心肌梗死疤痕位                                        置
+、形状、面积等和异位起搏点数量、位置等\cite{carmeliet1999cardiac}。
+心脏起搏点在TMP的表现为在心脏的每个心拍周期内，TMP幅值第一次快速上升。
+心肌梗死在TMP上的表现为，TMP幅值在一个心拍周期内不变化或者较小幅度的上升。
+通过这个分析，医生可以判断心脏健康状况。
+如\autoref{fig:tmp}所示，可以根据TMP的幅值可以明显看出图(a)中的异位起搏点发生在右心室流
+出道后侧；而图(b)中可以根据TMP的幅值直接显示了梗死发生在右心室外侧，并且可以从视觉上看出梗死疤痕形状
+、面积、边缘
+细节等信息。图(c)和图(d)分别对应异位起搏和心肌梗死的体表心电图。
+\subsection{激活时间}
+生物电源是在心脏电生理活动中区静息组织和活性组织的波前两侧的巨大电势差。根据这个原因，研究人员
+改变了生理电源的表达，用更容易解决的逆问题取代这个波前，假设心脏细胞在激活期间的心脏外电场
+可以近似在波前上沿着法线方向的均匀双层电流偶极子(Uniform Double Layer of current dipoles，UDL)产生的电场。这种波前只能处在心脏细胞的电极上，因此
+要建立更简单方便的等效电源。UDL外部的电场时来自于激活区域边界经过的立体角函数，所以根据这原因可以使用
+相同立体角的UDL替换实际的激活波阵面。处于心脏边缘并且包含了所有当前时刻激活的组织的表面是最简单方便的
+等效UDL。这个表面的变化边界时是根据它下面心脏组织细胞的去极化时间即激活时间来定义的\cite{modre2002noninvasive}，并且它的范围是心脏
+外膜和心脏内膜的结合，是由心脏基部的一系列连续小邻接块组成。
+UDL的简化假设进一步简化心外场：
+\begin{equation}
+    \phi(r)=\int_{\Gamma _h}^{}T(y,x)J(t-\tau )  \,d\Gamma_h
+\end{equation}
+
+其中\(\phi(r)\)是心肌细胞跨膜电位,\(J\)是Heaviside阶跃函数，\(\tau\)是心脏表面\(\Gamma_h\)中的
+去极化的时间（激活时间）， \(T(y,x)\)是将心脏表面点\(x\)的贡献加权给躯干表面点\(y\)的传递函数。
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{tmp.png}
+    \caption{\label{fig:tmp}a为心脏异位起搏的电压分布，b为心肌梗死的电压分布，c为异位起搏的体表心电图，d为心肌梗死的体表心电图}
+\end{figure}
+\section{电生理成像}
+
+医学成像技术让基于解剖模型的心脏电生理成像达到了较高的精度。但是目前对个体特异性的器官组织的
+生理参数的估计仍面临一些尚未解决的关键挑战。心脏器官的生理信息通常不可以直接获得，
+医生通常使用体表心电图间接判断心脏疾病。这种方法存在精确度问题。
+电生理成像是特定手段得到心脏的电生理活动，例如心脏细胞外模电位、心肌细胞跨膜电位等。
+电生理成像的方式分为有创电生理成像和无创电生理成像。有创电生理成像得到TMP是
+使用有创手术如光学测绘和导管测绘获得TMP的测量结果。然而，这种费时费力的点对点绘图
+过程具有侵入性和耗时的问题，并使患者面临致命心律失常和
+暴露于荧光辐射的风险。
+无创电生理成像是通过BSP经过算法重建心脏电生理信号\cite{ghanem2005noninvasive,wang2007focal}。
+因此无创电生理成像利用体表测量的
+非侵入性的BSP获得TMP。
+% 目前主要的方法有三种：1、基于数学模型的迭代优化；
+% 2、基于数驱动的深度学习方法；3、基于数学模型的深度学习方法。基于迭代优化的方法由于个体的特异性，不同个体间存在差异，数学模型
+% 的参数变化较大，在建立统一的生理模型上存在困难，导致最后的优化效果无法达到最优。基于深度学习的方法，
+% 如基于贝叶斯方法的变分自编码网络和基于图卷积的变分自编码网络。这些方法都是基于大量数据的基础，使得网络
+% 学习到了数据的分布，依赖于数据的数量和质量。将深度学习方法和数学模型相结合的方法可以解决上述两种问题的缺点，
+% 使方法同时具有数学可解释性和深度学习的强大表达能力。
+\section{科学问题}
+
+% 无创心脏电生理成像，是一种病态的逆问题。它意一种非侵入式的通过体表电信号重建出心脏电信号。
+% 这项技术的出现是为了解决当前临床技术的局限性，如
+% 心电图和导管成像在监测和诊断心脏功能存在信息少和危害人体的问题。心电图提供了体表电压变化
+% ，可以提供心脏电生理功能障碍的诊断信息。但是，体表电信号是在低空间分辨率下获得
+% 的(通常是12导联记录)，缺乏心电传播的区域详细信息，但这是医生介入治疗如心律失常基质的
+% 定位和消融所
+% 必需的。为此，在目前的临床环境中，导管显像被用于直接记录心脏表面不同位置
+% 的电压测量。。为了解决与有创成像模式相关的局限性，开发了心脏电生理成像，从低空间分辨率
+% 体表电信号重建出高空间分辨率的心脏电信号。
+% \begin{equation}
+%     \left\{
+%     \begin{array}{lr}
+%         \frac{\partial u}{\partial t}=\nabla\cdot (D_d \nabla u)+f_1(u,v),&\\
+%         \frac{\partial v}{\partial t}=f_2(u,v),&
+%     \end{array}
+%     \right.
+%     \label{eq:shuang}
+% \end{equation}
+
+无创心脏电生理成像模型个体特异性可以分为解剖学的个体特异性和生理学的个体特异性。
+不同个体之间他们的生理参数不同，无法建立具体的生理方程。
+双变量公方程\cite{luo1994dynamic}解释了TMP在心脏上是动态传播的，不同类型的参数可以控制
+TMP的波形。
+% \(f_1\)和\(f_2\)的形式会根据不同个体的生理参数发生变化，同时
+% 不同的形式控制着TMP的形状，\(u\)和\(v\)代表TMP和传导电流。
+根据双变量方程和麦克斯韦方程组的准静态理论\cite{henriquez1993simulating}
+可以建立
+方程如下：
+\begin{equation}
+    \left\{
+    \begin{array}{lr}
+        \phi_t=Hu_t,&\\
+        u_t=f(u_{t-1}),&
+    \end{array}
+    \right.
+    \label{eq:zhengxiang1}
+\end{equation}
+
+上述方程中，\(H\)是BSP到TMP的传导矩阵，\(f\)代表TMP前后时刻的映射关系，\(u_t\)表示t时刻的TMP，\(\phi_t\)表示
+t时刻的BSP。
+无创心脏电生理成像利用计算机技术，从心脏和躯干解剖模型和体表心电图，
+非侵入性地估计心脏生物电源活性。这类问题的难点在于:
+不同的3D心脏模型可能产生相同的结果表面测量。此外，心脏源和体表测量之间
+的介质的衰减和平滑效应增加了这个问题的难度。而且，体内电生理活动的
+测量与大量的未知来源，使这个问题更具有挑战性。必须按顺序对解进行适当的假设
+克服问题的病态性，得到唯一的解。重建TMP的关键是将TMP的动态激活模型和TMP的正向模型结合即公式\autoref{eq:zhengxiang1}。
+
+
+在\cite{wang2009personalized}中提出使用卡尔曼滤波的方法求解上述公\autoref{eq:zhengxiang1}，
+巧妙地融合了TMP动态激活模型和正向模型。在重建TMP上，因为时序上的关系是非线性并且不可局部线性化，有研究者则采用了蒙特卡洛模拟
+解决了这个问题。但是这种方法仍然存在两个缺点。首先是个体参数导致的非线性关系还是要根据个体来设置。
+然后，卡尔曼滤波求解问题的关键是计算出合适的卡尔曼增益系数，BSP和TMP的维度太大，导致卡尔曼增益系数的精确计算存在巨大挑战。
+
+
+\section{论文贡献与组织结构}
+
+本文提出了一种基于生理模型的深度学习框架重建心肌跨膜电位。本文将卡尔曼滤波与深度学习相结合，
+同时具备传统方法的数学可解释性
+和深度学习强大的学习能力。
+本文的贡献可以分为以下三点：
+
+(1)提出使用循环神经网络来学习状态转移方程，通过循环神经网络针对不同时间帧的迭代结构来自适应的学习TMP潜在
+时序关系。
+
+(2)本文基于卷积神经网络解决了
+由于卡尔曼滤波算法中存在噪声参数矩阵设置困难的问题。本文提出将TMP的先验估计和BSP做融合后，通过卷积网络学习得到卡尔曼增益系数。
+
+(3)更进一步将图卷积和注意力机制结合构建了图注意力模块，将非欧氏空间的几何心脏先验信息加入本文提出的算法框架
+，提升算法重建TMP的能力。
+
+本文的组织结构如下：
+
+第一章主要介绍了课题背景、电生理成像和科学问题。
+
+第二章主要介绍了心脏电生理模型以及目前重建TMP的方法。
+
+第三章介绍本文实验数据的生成和临床数据的处理。
+
+第四章提出了基于卡尔曼滤波的深度学习方法，
+介绍了本文提出方法的模块构成和训练设置以及实验验证。
+
+第五章更进一步提出图注意力机制模块，将心脏的几何先验信息加入，
+从非欧氏空间重建TMP，并进行了实验进行验证
+
+第六章总结了本文工作的贡献和未来展望。
+
+
+
+\chapter{研究背景及研究现状}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{cardiac.png}
+    \caption{\label{fig:heart2}人类心脏纵向横切面示意图，显示四个主要腔室和主要心脏传导系统    }
+\end{figure}
+\autoref{fig:heart2}展示了人体心脏纵向横切面示意图。
+心脏分为四个腔室:左右心房、左右心室。右心房通过静脉接收身体的脱氧血液，并将其输送到右心室，
+右心室将血液泵到肺，在这里血液会吸收氧气。
+含氧血液在左心房收集，然后通过二尖瓣，输送到左心室，左心室将其泵入全身，这一系列流程构成了一个循环。
+因此心脏相当于一个电动机系统，这个系统在心肌的机械收缩和舒张中起着至关重要的作用\cite{rasmussen1978cardiac}。
+
+在过去的几十年里，大量无创电生理成像的方法被提出，
+无创电生理成像的前提是寻找合适的先验假设心
+源分布模型。这些模型大体上可分为两类:1）
+心外膜电位形式的表面源模型，或激活时间
+心室表面模型；2)动作电位壁内容积源模型。基于表面的源模型通过将解约束在心脏表面，
+而透壁源模型依靠进一步的假设来克服这种物理病态。
+
+
+\section{TMP动态激活模型}
+TMP动态激活模型是一种非线性动态模型\cite{dehaghani2015uncertainty,xu2016bayesian}，它包含了三维心肌TMP时空演化的一般
+信息。
+% 本小节简要介绍了TMP的动态激活模型，为本文所提出的深度学习框架提供了充分的背景。
+
+TMP动态激活模型的复杂性从宏观层面的双变量  
+方程\cite{fitzhugh1961impulses}到细胞水平超过15个变量的LuoRudy模型\cite{luo1994dynamic}。  
+其中，双变量方程在电生理逆问题求解中是有利的，
+因为它能够平衡模型的合理性、反问题的可解性和计算可行性。双变量方程表示为：
+\begin{equation}
+    \left\{
+    \begin{array}{lr}
+        \frac{\partial u}{\partial t}=\nabla\cdot (D_d \nabla u)+f_1(u,v),&\\
+        \frac{\partial v}{\partial t}=f_2(u,v),&
+    \end{array}
+    \right.
+    \label{eq:shuang2}
+\end{equation}
+其中，\(u\)是心脏跨膜电位（TMP），\(v\)是传导电流，\(\nabla\)是扩散张量，\(D_d\)扩散项，
+\(\nabla\cdot (D_d \nabla u)\)解释了电传播在细胞间的耦合。
+\(f_1(u,v)\)和\(f_2(u,v)\)的变化产生不同形状的心脏跨膜电位波形\cite{huiskamp1997new,pullan2001noninvasive,modre2002noninvasive}。相关边界条件
+是假设心脏表面没有传导电流，\(\vec{n}\)是边界曲面的外法向量。
+
+根据公\autoref{eq:shuang2}，采用无网格法\cite{bordas2008three,rabczuk2007meshfree,rabczuk2007three}将个性化的心脏在三维空间离散化：
+\begin{equation}
+    \left\{
+    \begin{array}{lr}
+        \frac{\partial u}{\partial t}=-M^{-1}Ku+f_1(u,v),&\\
+        \frac{\partial v}{\partial t}=f_2(u,v),&
+    \end{array}
+    \right.
+    \label{eq:twov}
+\end{equation}
+
+\(M\)和\(K\)是基于无网格方法获得的矩阵\cite{liu2005introduction}，记录了心脏心肌细胞三维的结构和
+传导各项异性。通过将该模型应用于心脏电生理学的无创电生理成像，不仅可以从TMP
+的时序信息上得到先验的生理信息，还将受心肌各向异性和异质性影响的TMP空间
+变化纳入了先验生理信息。有了这种生理学上有意义的指导，从给定的BSP数据中
+获得三维心肌内部体积电生理细节的唯一解成为可能。
+
+% 心脏电生理成像利用计算技术，从心脏和躯干解剖模型的体表心电图方法，
+% 非侵入性地估计心脏生物电源活性。一般来说，无创电生理成像包括
+% 解决一个缺乏唯一透壁解的严重不适定逆问题
+% 以最无拘无束的形式。这种不协调是由潜在的生物物理学问题造成的:
+% 不同的3D源配置可能产生相同的结果表面测量。此外，心脏源和体表测量(躯干容积传导
+% )之间
+% 的介质的衰减和平滑效应增加了这个问题的不恰当性。此外，有限的数量
+% 地面测量与大量的未知来源相比，使这个问题更加不可靠。必须按顺序对解进行适当的假设
+% 克服问题的病态性，得到唯一的解。
+
+
+
+\section{TMP正向模型}
+BSP是TMP从心脏经过人体躯干传导至人体表面的电位分布。根据麦克斯韦方程组的准静态近似，
+躯干表面的电压是来源于心源\cite{miller1990finite}。在心肌空间\(\Omega_h \)内，重新定义
+细胞外电位\(\phi_e\)作为TMP的分布：
+
+\begin{equation}
+    % \left\{
+    \begin{array}{rr}
+        \nabla (D_i(r)+D_e(r)) \nabla \phi_e (r) = \nabla(-D_i(r) \nabla u(r))  &\\
+        =\nabla(D_k(r) \nabla \phi_e(r)) 
+    \end{array}
+    \qquad \forall r \in \Omega _h
+    % \right.
+    \label{eq:h1}
+\end{equation}
+其中\(r\)表示空间极坐标。\(D_i\)和\(D_e\)是细胞内和细胞外的电导率张量。它们的总和\(D_k\)是
+体电导率张量。\(\Omega_{t/h}\)表示心脏表面到体表的区域。假设人体躯干内不存在其他电源
+，计算电位\(\phi_t\)。
+\begin{equation}
+    \nabla(D_t(r) \nabla \phi_t(r))=0 \qquad \forall r \in \Omega _h
+    \label{eq:h2}
+\end{equation}
+
+\(D_t\)是躯干导电性张量。\(D_k\)的各向异性比\(D_i\)小一个数量级，仅仅保留\(D_i\)的各向异性，
+以降低模型的复杂度。这一假设来源于斜偶极子模型，这个模型考虑到各向异性组织特性，以产生
+的初级电流，但不考虑被动或次级的电流\cite{colli1982potential}。此外，由于躯干组织之间的传导不均
+匀性对BSP几乎没有影响，在TMP重建中使用均匀躯干模型以减少问题的规模。
+% 简化公\autoref{eq:h1}和公\autoref{eq:h2}。
+
+假设\(\Omega_h \)和\(\Omega_{t/h}\)是躯干导体的两个部分，其中它们的电导率\(\sigma_k \neq \sigma_t\)。
+将公\autoref{eq:h1}和公\autoref{eq:h2}简化为泊松方程和齐次拉普拉斯方程：
+\begin{equation}
+    \sigma_k \nabla^2 \phi_e (r)=\nabla \cdot (-D_i(r)\nabla (r)) \qquad \forall r \in \Omega _h 
+    \label{eq:h3}
+\end{equation}
+\begin{equation}
+    \sigma_k \nabla^2 \phi_t (r)=0 \qquad \forall r \in \Omega _h 
+    \label{eq:4}
+\end{equation}
+
+电位和电流在心脏表面\(\Gamma_h \)是连续的。
+\begin{equation}
+    \phi_e=\phi_t \qquad \forall (r) \in \Gamma_h
+    \label{eq:h5}
+\end{equation}
+
+\begin{equation}
+    \sigma_k \frac{\partial \phi_e}{\partial \overrightarrow{n} } +
+    D_i(r)\frac{\partial u(r)}{\partial \overrightarrow{n} }=
+    \sigma_t \frac{\partial \phi_t (r)}{\partial \overrightarrow{n} }
+    \qquad \forall (r) \in \Gamma_h
+    \label{eq:h6}
+\end{equation}
+
+因为没有传导电流离开躯干表面\(\Gamma_t\):
+\begin{equation}
+    \frac{\partial \phi_t (r)}{\partial \overrightarrow{n} }=0 \qquad r \in \Gamma_t
+    \label{eq:h7}
+\end{equation}
+\(\overrightarrow{n} \)表示曲面的外法向量。将躯干\(\Omega_t\)简化为均匀的导体即
+\(\sigma_k=\sigma_t=\sigma\)，后将公\autoref{eq:h1}和公\autoref{eq:h2}看做是
+\(\Omega_t\)内电位\(\phi\)分布的泊松方程\cite{brebbia2012boundary}。
+\begin{equation}
+    \sigma \nabla^2 \phi (r)=\nabla \cdot (-D_i(r) \nabla u(r)) \qquad \forall r \in \Omega_t
+    \label{eq:h8}
+\end{equation}
+
+\(\Omega\)包含了\(\Omega_{t/h}\)和\(\Omega_h\)，但是它们之间没有联系。物体表面的边
+界条件公\autoref{eq:h7}仍然适用在公\autoref{eq:h8}。
+
+通过求解公\autoref{eq:h3}得到公式
+\begin{equation}
+    \begin{array}{rr}
+        c(\xi ) \phi_e(\xi)+\int_{\Gamma_f}^{} \phi_e(r) q*(\xi,r) \,d \Gamma_{h}
+    -\int_{\Gamma_h}^{} \frac{\partial \phi_e (r)}{\partial \overrightarrow{n} }\phi*(\xi,r) \,d \Gamma_h &\\
+    =\int_{\Omega_h}^{} \frac{\nabla \cdot (D_i(r)\nabla u(r))\phi * (\xi,r)}{\sigma_k}  \,d \Omega_h &\\
+    \end{array}
+    \label{eq:h9} 
+\end{equation}
+
+\(c(\xi)\)与心脏表面\(\Gamma_h\)上点的光滑度有关：
+\begin{equation}
+    c(\xi)=
+    \left\{
+    \begin{array}{lr}
+        \frac{1}{2} \enspace \Gamma_h \enspace at \enspace smooth \enspace at \enspace \xi &\\
+        \frac{\theta}{4\pi}\qquad else
+    \end{array}
+    \right.
+    \label{eq:h10}
+\end{equation}
+\(\theta\)是角度。\(\phi * (\xi,r)\)和\(q*(\xi,r)\)是基础解和法向导数。在三维空间条件下，
+\(\phi *(\xi,r)\)被定义做\(\phi *(\xi,r)=\frac{1}{4\pi \vert \xi -r\vert}\)，其中\(\vert \xi-r \vert\)是
+\(\xi\)与\(r\)之间的欧式距离。公\autoref{eq:h9}右侧的积分通常近似为几个电流偶极子的总和
+。无网格策略被引入到公\autoref{eq:h9}中，求得更简单并且更直接的近似。根据格林定理和分
+部积分，公\autoref{eq:h9}的右侧积分是:
+\begin{equation}
+    \frac{1}{4\pi \sigma_k}\int_{\Gamma_h}^{}\frac{D_i(r)}{\vert \xi - r \vert} 
+    \frac{\partial u(r)}{\partial \overrightarrow{n} } \,d \Gamma_h
+    -\int_{\Omega_h}^{} \nabla \frac{1}{\vert \xi - r \vert} \cdot (D_i(r)\partial u(r))  \,d \Omega_h 
+    \label{eq:h11} 
+\end{equation}
+边界条件\autoref{eq:h9}将第一项转化为：
+\begin{equation}
+    \frac{1}{4\pi \sigma_k}\int_{\Gamma_h}^{} \frac{1}{\vert \xi-r \vert} 
+    (\sigma_t \frac{\partial \phi_t (r)}{\partial \overrightarrow{n} }-\sigma_k
+    \frac{\partial \phi_e (r)}{\partial \overrightarrow{n} })\,d \Omega_h 
+    \label{eq:h12}
+\end{equation}
+
+将公\autoref{eq:h9}左侧体积分和右侧体积分消去，将简化为：
+\begin{equation}
+    \begin{array}{rr}
+        c(\xi ) \phi_e(\xi)+\int_{\Gamma_f}^{} \phi_e(r) q*(\xi,r) \,d \Gamma_{h}
+    -\int_{\Gamma_h}^{} \frac{\sigma_t}{\sigma_k}\phi*(\xi,r)\frac{\partial \phi_t(r)}{\partial \overrightarrow{n} } \,d \Gamma_h &\\
+    =-\frac{1}{4\pi \sigma_k} \int_{\Omega_h}^{} \nabla \frac{1}{\vert \xi - r \vert} \cdot
+    (D_i(r) \nabla u(r))  \,d \Omega_h  &\\
+    \end{array}
+    \label{eq:h13}
+\end{equation}
+
+公\autoref{eq:h13}左侧的边界积分可以被离散化为高斯正交计算的每个边界上的积分之和。将无网格法
+应用在公\autoref{eq:h13}上，对右侧体积分在整个心肌空间上进行高斯离散积分：
+\begin{equation}
+    \begin{array}{rr}
+        c(\xi ) \phi_e(\xi)+
+        \sum_{N^e_h}^{i=1} \int_{\Gamma_f^e}^{} \phi_e(r) q*(\xi,r) \,d \Gamma_{h}^e
+    -\sum_{i=1}^{N_h^e}\int_{\Gamma_h}^{} \frac{\sigma_t}{\sigma_k}\phi*(\xi,r)\frac{\partial \phi_t(r)}{\partial \overrightarrow{n} } \,d \Gamma_h^e &\\
+    =c(\xi)\phi_e(\xi)+\sum_{i=1}^{N_h^e}\sum_{j=1}^{n_g} \phi_e(r) q*(\xi,r)-
+    \sum_{i=1}^{N_h^e}\sum_{j=1}^{n_g} \frac{\sigma_t}{\sigma_k}\phi*(\xi,r)\frac{\partial \phi_t(r)}{\partial \overrightarrow{n} } &\\
+    =-\frac{1}{4\pi \sigma_k} \int_{\Omega_h}^{} \nabla \frac{1}{\vert \xi - r \vert} \cdot
+    (D_i(r) \nabla u(r))  \,d \Omega_h  &\\
+    \end{array}
+    \label{eq:h14}
+\end{equation}
+
+在心脏表面\(\Gamma_h\)中，\(N_h^e\)是心脏表面离散化的后三角网格\(\Gamma_h^e\)，\(n_g\)是
+\(\Gamma_h^e\)的节点数。\(N_g\)心肌空间的节点数。下表\(j\)和\(k\)表示节点的索引。
+
+通过边界元法，\(\Gamma_h^e\)中任意一点上的变量都是从\(\Gamma_h^e\)的所有顶点插值而来的；
+通过无网格方法，\(\Omega_h\)内每个
+点的变量都是从所有无网格点插值出来的。用于插值的形状函数分别由边界元法和无网格法构造
+。向量\(\Phi_e\)和\(Q_{et}\)由来
+自所有\(H_h\)顶点的\(\phi_e\)和\(\frac{\partial \phi_t}{\partial \overrightarrow{n} }\)
+组成，根据公\autoref{eq:h14}可以得到：
+\begin{equation}
+    L_h \Phi_e+P_hQ_{et}=BU
+    \label{eq:h15}
+\end{equation}
+
+\(L_h\)和\(P_h\)是来源于边界积分，\(B\)来源于无网格法。同样地，可以将公\autoref{eq:h6}
+转换为边界积分形式：
+\begin{equation}
+    c(\xi)\phi_t(\xi)+\int_{\Gamma_{h/t}}^{}\phi_t(r)q*(\xi,r)  \,d \Gamma_{h/t}
+    =\int_{\Gamma_{h/t}}^{}(\frac{\partial \phi_t(r)}{\partial \overrightarrow{n} }) 
+     \phi *(\xi,r)\,d \Gamma_{h/t}  
+    \label{eq:h16}
+\end{equation}
+
+\(\Gamma_{h/t}\)包含了心脏表面\(\Gamma_h\)和躯干表面\(\Gamma_t\)。但是\(\Gamma_{h/t}\)的外向
+法线向量和
+\(\Gamma_h\)外向法线向量相反。\(\Phi_{te}\)和\(Q_{te}\)由\(\Gamma_h\)上的\(N_h\)个顶点
+的\(\phi_t\)和\(\frac{\partial \phi_t}{\partial \overrightarrow{n} }\)组成，\(\Phi\)和
+\(Q\)由\(\Gamma_t\)上的\(N\)个顶点组成，将公\autoref{eq:h16}转化为：
+\begin{equation}
+    L_t\Phi+P_tQ_t=0
+    \label{eq:h17}
+\end{equation}
+\(\Phi_t=(\Phi_{te}^T \Phi^T)^T\)和\(Q_t=(Q_{te}^TQ^T)^T\)。同时，边界条件将定义为：
+\begin{equation}
+    \Phi_{te}=\Phi_e
+    \label{eq:h18}
+\end{equation}
+\begin{equation}
+    Q_{te}=-Q_{et}
+    \label{eq:h19}
+\end{equation}
+公\autoref{eq:h19}中的负号是\(\Omega_h\)和\(\Omega_{h/t}\)相反的法向量结果导致的。
+将公\autoref{eq:h15}和公\autoref{eq:h17}在\(\Gamma_h\)上耦合，经过矩阵变换后得到：
+\begin{equation}
+    (\left(L_h \quad 0\right) +\left(P_h \quad 0\right)P_t^{-1}L_t) (\Phi_e \quad \Phi)^T=BU
+    \label{eq:h20} 
+\end{equation}
+公\autoref{eq:h20}中所涉及的变量\(\Phi_e\)与心脏电生理重建问题无关，但其高维数极大地增加了该模型的计算
+要求和数值难度。
+
+按照同样的思路求解公\autoref{eq:h8}得到公式：
+\begin{equation}
+    \begin{array}{rr}
+        c(\xi)\phi (\xi)-\int_{\Gamma_t}^{}\phi(r)q*(\xi,r)  \,d\Gamma_t
+        -\int_{\Gamma_t}^{} (\frac{\partial \phi(r)}{\partial \overrightarrow{n} })\phi
+        (\xi,r) \,d\Gamma_t &\\
+        =\frac{1}{4\pi \sigma}(\int_{\Gamma_t}^{}\frac{D_i(r)}{\vert \xi-r \vert}
+        \frac{\partial u(r)}{\partial \overrightarrow{n} }  \,d\Gamma_t 
+        -\int_{\Omega_t}^{}\nabla \frac{1}{\vert \xi -r \vert} \cdot (D_i(r)\nabla u(r)) \,d\Omega_t)  
+    \end{array}
+    \label{eq:h21}
+\end{equation}
+
+
+
+根据边界条件\autoref{eq:h7}和没有电流离开\(\Gamma_t\)的假设，消去公\autoref{eq:h21}左边
+面积分上的第三项和右边面积分的第一项。
+通过无网格法和边界元方法可以将公\autoref{eq:h21}
+转化为：
+\begin{equation}
+    L\Phi=BU
+    \label{eq:22}
+\end{equation}
+
+\(L\)是通过边界积分构造，\(B\)是由无网格法构造。公\autoref{eq:22}中在给定\(U\)到\(\Phi\)
+的解才是确定的。
+为了得到唯一解，通过将\(\Gamma_t\)上的面积分定义为零(\(\int_{\Gamma_t}^{}\phi(r)  \,d \Gamma_t =0 \))来应用附加约束AΦ = 0。
+
+将\(L\)用\(A\)扩充为\(L_a\), \(B\)相对应扩充为\(B_a\)，公\autoref{eq:22}重新排列为:
+\begin{equation}
+    L_a\Phi=B_aU
+    \label{eq:23}
+\end{equation}
+
+在给定某一时刻的\(u_t\)，可以通过求解公\autoref{eq:23}得到某一时刻的\(\phi_t\)。为了避免
+TMP重建过程中的额外计算，采用最小范数法得到TMP到BSP的线性模型：
+\begin{equation}
+    \Phi=(L_a^TL_a)^{-1}L_a^TB_aU=HU
+\end{equation}
+\(\Phi=(\phi_0...\phi_t)\)，\(U=(u_0...u_t)\)。
+H是状态转移矩阵，编码了个性化心脏躯干结构中的所有解剖和电导率信息。
+
+
+\section{TMP重建现状}
+从BSP求解出TMP是一个病态的逆问题，因为BSP的维度要远远小于TMP的维度，从矩阵论的角度解释就是
+存在无穷多组解。TMP从一个较高维度压缩到较低的维度，逆向求解TMP，必然存在信息的缺失，所以
+重建TMP的关键是如何加入更多的先验信息。
+目前重建TMP的方法如\autoref{fig:fangfafenlei}所示，可以归为三大类，1.基于数学模型的迭代优化方法；2.基于数据驱动的深度学习方法；3.
+基于数学模型的深度学习方法。
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{methods.png}
+    \caption{\label{fig:fangfafenlei}TMP重建方法分类示意图}
+\end{figure}
+
+迭代优化的方法主要可以分为两种：基于损失函数进行迭代优化和数据融合时间序列迭代。
+基于损失函数的迭代优化是针对从TMP到BSP的正向过程设置损失函数，然后基于一些生理信息设置正则项。
+例如，通过心源模型的空间和时间平滑性来约束损失函数，并通过不同的数值计算技术来实现，
+如\(L_p\)范数正则化。
+基于数据融合的时间序列迭代是通过结合TMP动态模型和TMP正向模型进行TMP重建。例如，将卡尔曼滤波与蒙特卡尔罗算法结合解决
+TMP动态激活模型的非线性问题以达到TMP重建的目的。
+
+
+基于数据驱动的算法是在大量数据的基础上通过特殊的神经网络结构学习数据的分布，从而达到从信息量较低的维度恢复出高维度的信息。
+例如基于变分自编码网络的算法，它是基于贝叶斯理论的，是一种基于循环神经网络的生成模型，通过编码器学习隐空间变量的高斯分布
+，通过解码器从隐空间恢复出TMP。还有将图卷积与VAE结合，在网络中融入心脏的几何信息。
+
+将深度学习与数学模型结合，这种方法结合了深度学习和数学模型方法共同的优势，例如
+基于迭代软阈值收缩网络的图卷积网络
+，它将心脏的几何先验信息与软阈值收缩网络相结合。
+% 最近，基于l1范数的稀疏模型也被用于加强空间解的低维特征。
+% 此外，3D电激发计算模型生成的生理先验知识也被用于约束跨壁EP成像问题，它们还依赖于固定的假设，这些假设可能无法推广到该属性
+% 在不同条件下的EP激发。例如，它们可能强制源代码
+% 分布遵循一个预设的空间结构，不一定反映
+% 心源的时空演变。心脏来源经历一个复杂的过程
+% 每个心脏周期的时空过程。最初，心脏源只在
+% 几个稀疏分布的焦点。然后形成一个激发波前
+% 去极化期:类似于分隔兴奋心肌的锋利边缘的去极化期
+% 静止细胞的细胞。接着是复极波前，与激发波前相比，复极波前更加扩展和平滑。
+% 因此，当源表现出紧凑的空间特性时，如在激发期的开始，稀疏模型直观地是理想的
+% 而平滑约束模型更适合心脏源的扩展分布，如复极期。此外，在组织特性异质性增
+% 加的病理心脏中，来源的稀疏性或平滑性很难先验预测。总的来说，固定的先验模型
+% 在用于约束心电兴奋的复杂时空特性时可能有其局限性。
+\subsection{迭代正则化}
+TMP的正向模型描述了TMP到BSP的转换模型，根据公\autoref{eq:23}设置损失函数为：
+\begin{equation}
+    min_u\enspace \Vert \phi_t-Hu_t\Vert_2^2
+    \label{eq:yueshu}
+\end{equation}
+为了对病态逆问题的损失函数进行约束，通常加入正则化项约束损失函数，
+这种正则化可以表述为:
+\begin{equation}
+    \left\{
+    \begin{array}{lr}
+        min_u \enspace\Vert \phi_t -Hu_t \Vert_2^2+\lambda \Vert Lu_t \Vert_p&\\
+        \Vert u_t \Vert_p=(\sum_{i=1}^N [u_t^i]^p )^{1/p},1<=p<=2&
+    \end{array}
+    \right.
+\end{equation}
+\(\phi_t\)是体表t时刻的测量电位，\(u_t\)是t时刻的TMP，\(N\)是\(u\)的维度即离散节点的数量
+用来表示心室心肌,\(L\)是正则化矩阵
+，\(\lambda\)是正则化系数。在正则化中改变\(p\)值能够结合不同的固定先验模型对TMP进行重建。
+
+当p=2，正则化项是凸函数\cite{greensite1998improved}，可以使用梯度下降法直接求解数值解\cite{hofmann2007convergence,vauhkonen1998tikhonov}：
+\begin{equation}
+    u_t=(H^TH+\lambda L^TL)^{-1}H^T\phi_t
+\end{equation}
+
+通过加入\(L_2\)范数正则化，給优化的目标函数添加了先验信息，虽然这样的方法很快捷，
+但是根据\(L_2\)范数原理，TMP重建的结果会趋向平滑，特别是在心肌细胞TMP变化较大的区域，
+将会使原本清晰的病灶区域边缘模糊化。在重建心脏异位起搏和心肌梗死的病例时，会出现
+重建心脏的异位起搏和心肌梗死的边缘模糊，不利于辅助医生治疗。
+更重要的是需要人工定义正则化系数\(\lambda\)，需要花费大量时间调节出合适的正则化系数，不利于
+临床应用。
+% \subsubsection{Lp-svd正则化}
+% 在[]中，进一步将时间信息纳入lp范数正则化，以提高时间一致性和对噪声的鲁棒性。
+% 各向同性的假设模型[]被提出，并假设心脏源与体表电信号具有
+% 相同的时间基础功能。这些时间基函数可以通过不同的变换得到，考虑对
+% 心电测量值进行奇异值分解:\(\Phi=UST^{'}, T=[t_1,t_2,\dots,t_k]\)定义标准正交时间基函数。
+% 将体表电信号和心电源投影到基函数T上。新的变量\(\hat{\Phi}=\Phi T,\hat{u}=uT\)表示对应的投影系数。
+% 然后，应用lp范数正则化来重构新的变量\(v\)到\(\Phi\)。这样，Lp正则化问题转化为空间域的表述：
+% \begin{equation}
+%     \left\{
+%     \begin{array}{lr}
+%         min_v \Vert \hat{\Phi} -H\hat{u} \Vert_2^2+\lambda \Vert u \Vert_p&\\
+%         \Vert u \Vert_p=(\sum_{i=1}^n [u_i]^p )^{1/p},1<p<2&
+%     \end{array}
+%     \right.
+% \end{equation}
+% \(n\)是\(\hat{u}\)维度，表示心脏表面网格的节点数量。将具有不同p值的lp范数先验模型放在
+
+
+当p=1，\(L\)是梯度矩阵时，优化的目标函数就变成了全变分正则化法\cite{ghosh2009application,xu2014noninvasive,xu2013novel}。全变分方法
+是属于\(L_1\)范数，是一种稀疏约束的方法，它的原理是对邻域施加稀疏约束
+，由于稀疏的特性，可以抑制噪声和抑制区域的平滑特性。
+基于图的全变分正则化将局部的相似性推广到全局，通过
+心脏的几何结构计算心脏不同节点之间的权重，并且将TMP的时序信息加入，考虑到更多的生理先验
+信息。
+基于图的全变分正则化\cite{xie2019non}的目标函数可以写作以下形式:
+\begin{equation}
+    \left\{
+    \begin{array}{lr}
+        W(i,j)=exp(-\frac{\Vert u_t^i-u_t^j \Vert_2^2}{\sigma^2})&\\
+        \Vert \nabla_G u_t \Vert_1=\sum_{i\in n}\sum_{j \in n_j}\sqrt{W(i,j)}\Vert u_t^i-u_t^j \Vert_1 &\\
+        min_v \enspace \Vert \phi_t -Hu_t \Vert_2^2+\lambda \Vert \nabla_G u_t \Vert_1&
+    \end{array}
+    \right.
+\end{equation}
+通过k阶近邻搜索算法，构建心脏的邻接矩阵。\(W(i,j)\)是衡量两个节点之间的权重，TMP的幅值
+相差较大时，权重大
+，幅值接近时，权重小。
+
+因为\(L_1\)范数的正则项是非凸函数，在靠近0值时是不可微分问题，无法使用单独的梯度下降方法
+进行求解，
+所以求解上述目标函数的方法可以根据前向后向原始对偶算法\cite{he2014convergence,h2001new,xu2013novel}，
+即采用梯度下降和近端映射结合的方法来求解
+最小化不可微分函数问题。
+% 可以上述目标函数转化为迭代公式：
+% \begin{equation}
+%     \left\{
+%     \begin{array}{lr}
+%         r_k=u_{t,k-1}-\alpha_k \nabla h(u_{t,k-1}) &\\
+%         u_{t,k}=arg\enspace min\enspace \frac{1}{2} \Vert u_{t,k-1}-r_k \Vert_2^2+\alpha_k \lambda \Vert \nabla u_{t,k-1} \Vert &
+%     \end{array}
+%     \right.
+%     \label{eq:g}
+% \end{equation}
+% 通过不断迭代公式\autoref{eq:g}，达到最后结果收敛。
+\subsection{数据融合迭代}
+
+将心脏看做是一个系统\cite{wang2009personalized}，在考虑到预测噪声和观测噪声下，以数据融合的方法，建立心脏的
+状态空间\cite{aoki2013state}，从体表的观测
+信号BSP估计出心脏状态量TMP。状态空间分为状态转移方程和观测方程。根据TMP动态成像模型
+和AP模型可以得到：
+\begin{equation}
+    \begin{array}{ll}
+        \frac{\partial u_t}{\partial t}=\nabla (D\nabla u_t)-cu_t(u_t-\theta)(u_t-1)-u_tv_t,&\\
+        \frac{\partial v_t}{\partial t}=e(u_t,v_t)(-v_t-cu_t(u_t-\theta-1))
+    \end{array}
+    \label{eq:dy}
+\end{equation}
+
+
+求解公\autoref{eq:dy}，可以得到状态转移方程。TMP正向模型是观测方程。不论TMP经过躯干
+传导到体表还是不同时间
+TMP的传导，都会存在误差或者噪声，
+因为它们所表示的信息不同于特定的受试者条件，通常是在人群之间的参数变化和病理条
+件下的模
+型结构不精确导致的。额外的建模误差也产生于来自层析成像的心脏躯干结构的个性化。为了明确地
+允许这些不确定性的存在，生理系统被重新
+表述为状态空间表示。在状态转移方程和观测方程中分别设置噪声\(\omega_t\)和\(\epsilon_t\)。
+因为状态转移方程中包含了两个变量，
+分别是TMP(\(u\))和传导电流\(v\)，因此重新定义
+状态向量为\(x_t = (u_t^Tv_t^T)^T \)。心脏的状态空间方程可以表述为:
+\begin{equation}
+    \left\{
+    \begin{array}{lr}
+         x_t=F(x_{t-1})+\omega_t &\\
+        \phi_t=(H \enspace 0)x_t+\epsilon_t=\hat{H}x_t+\epsilon_t
+    \end{array}
+    \right.
+    \label{eq:ss}
+\end{equation}
+
+
+数据融合\cite{bleiholder2009data,khaleghi2013multisensor,hall1997introduction}通过结合不确定系统模型和观测的信息来解释系统的潜在状态。序列数据同化，
+如滤波技术，在时域内以迭代的方式进行求解\cite{wan2000unscented}。在每次迭代中，使用先前的估计和系统模型来计算未知
+的预测，然后更新为给定可用数据的最终估计。
+由于心脏的状态转移方程是非线性化的，并且不可以局部线性化，
+因此无法使用广义的卡尔曼滤波算法和集成卡尔曼滤波算法进行求解\cite{wan2001unscented,meinhold1989robustification}。
+
+将蒙特卡尔洛模型\cite{ristic2003beyond}和卡尔曼滤波\cite{1995An,kim2018introduction}结合，解决非线性状态转移矩阵问题。卡尔曼滤波主要分为两个过程
+预测和更新，通过状态转移的预测和当前时间的观测估计当前时间的最有估计。
+在进行预测之前先进行\(\sigma\)点和权重的计算。
+
+计算\(\sigma\)点\(\chi _{k-1,i}(i=0...4M)\)：
+\begin{equation}
+    (\chi_{k-1,i})_{i=0}^{4M}=(\hat{x}_{k-1}\quad \hat{x}_{k-1}\pm \sqrt{(4M+\lambda)\hat{P}_{x_{k-1}}})
+\end{equation}
+
+权重\(W_i\):
+\begin{equation}
+    \left\{
+    \begin{array}{lr}
+        W_0^m=\frac{\lambda}{2M+\lambda}&\\
+        W_0^c=\frac{\lambda}{2M+\lambda}+(1-\alpha^2+\beta)&\\
+        W_i^m=W_i^c=\frac{1}{2(2M+\lambda)}i=1...4M
+    \end{array}
+    \right.
+\end{equation}
+
+预测：
+\begin{equation}
+    \left\{
+    \begin{array}{lr}
+        \chi_{k|k-1}=\hat{F}_d(\chi_{k-1,i})&\\
+        \hat{x}_k^{-}=\sum^{4M+1}_{i=0}W_i^m \chi_{k|k-1}&\\
+        P_{x_k}^-=\sum^{4M+1}_{i=0}W_i^c(\chi_{k|k-1}-\hat{x}_k^-)(\chi_{k|k-1}-\hat{x}_k^-)+Q_{wk}
+    \end{array}
+    \right.
+\end{equation}
+
+更新：
+\begin{equation}
+    \left\{
+    \begin{array}{lr}
+        G_k=P_{x_k}^- \hat{H}^T(\hat{H}P_{x_k}^-\hat{H}^T+R_{\nu _k})^{-1}&\\
+        \hat{x}_k=\hat{x}_k^-+G_k(Y_k-\hat{H}\hat{x}_k^-)&\\
+        \hat{P}_{x_k}=(I-G_k\hat{H})P_{x_k}^-
+    \end{array}
+    \right.
+\end{equation}
+
+\(\chi\)是\(\sigma\)点，\(2M\)是\(x\)的维度，\(W\)是\(\sigma\)点的权重。m和c分别代表
+均值和方差的权重。\(Q_{\omega_k}\)和\(Q_{\nu k}\)分别代表
+转移噪声和观测噪声的方差矩阵。在每一时刻的迭代中通过计算卡尔曼增益系数来平衡先验状态量和
+观测量，从而估计出最优的TMP。
+
+卡尔曼滤波的方法重建TMP在于调节状态转移噪声矩阵和观测噪声矩阵，计算出合适的卡尔曼
+增益系数，但是因为状态量和观测量的维度过大，噪声矩阵参数不易于调节，算法最终
+很难收敛。同时状态量包含了多余的传导电流变量，状态转移方程过于复杂化。
+
+\subsection{基于贝叶斯的变分自编码器}
+
+从BSP重建TMP是一个不适定的逆问题。模型约束正则化对于TMP的时序信息具有强大的功能，
+但是这些模型都是依靠高维度物理参数控制的，这些物理参数固定，将会引入模型误差，降低
+TMP重建的精度。通过深度生成模型取代传统的生理模型。
+变分自编码器(VAE)是一个生成模型，通过编码器将数据转化为一个理想的概率分布，然后通过解码器
+将理想的概率分别转化为真实数据\cite{ghimire2018generative}。
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{vae.png}
+    \caption{\label{fig:vae}基于贝叶斯的变分自编码网络}
+\end{figure}
+
+\autoref{fig:vae}展示了基于贝叶斯的变分自编码网络结构，编码器和解码器都由两层LSTM组成，
+其中第二层包括独立的均值和方差网络。编码器将高维度的TMP信号
+\(u\)编码到低维度的隐空间信号\(z\)，TMP时序关系由LSTM模拟。将矩阵的条件分布定义为各列分布的
+乘积，
+得到似然分布\(p_{\theta}(u|z)\)和变分后验分布\(q_{\phi}(z|u)\)为:
+\begin{equation}
+    \begin{array}{lr}
+        p_{\theta}(u|z)=\prod \mathcal{N} (u_{:,k}|M_{\theta}(z)_{:,k},diag(S_{\theta}(z)_{:,k}))&\\
+        q_{\phi}(z|u)=\prod \mathcal{N} (z_{:,k}|M_{\phi}(u)_{:,k},diag(S_{\phi}(u)_{:,k}))&
+    \end{array}
+\end{equation}
+
+其中\(M_{\phi}(u)\)和\(S_{\phi}(u)\)由\(\phi\)参数化的编码器的均值和方差网络输出，
+\(M_{\phi}(u)\)和
+\(S_{\phi}(u)\)由\(\theta\)参数化的解码器的均值和方差网络输出。
+VAE训练:通过使训练数据的最大似然概率的变分下界最大化来进行VAE训练:
+\begin{equation}
+    L_{ELB}(\theta,\phi;u)=-KL(q_{\phi}(z|u)||p_{\theta}(z))+E_{q_{\phi}(z|u)}(log  p_{\theta}(u|z))
+\end{equation}
+
+其中\(p_{\theta}(z)\)是各向同性的高斯先验。
+虽然VAE模型避免了高纬物理参数的带来的误差影响，但是VAE模型
+方法是从大量的数据特征中学习出潜在的数据分布，缺少生理模型的约束，对于数据质量和数量的要求高。
+
+\subsection{基于图卷积生成模型的图贝叶斯优化}
+大多数先前关于参数估计的工作依赖于基于心脏几何分割的解剖模型，用来获得优化时，参数空间变化的未知
+组织特性的低维（LD）表示。虽然这些方法利用了心脏的解剖信息，但预定义的物理参数限制了在高分辨
+率下表示复杂组织分布和异质性的能力。
+
+VAE作为极具表现力的低到高维度（HD）生成模型的替代方案，该模型允许将HD优化嵌入LD潜在空间
+。然而，它是在欧式空间处理数据，从而忽略了心脏中丰富的解剖信息\cite{dhamala2019bayesian}。
+基于图卷积的VAE算法允许在非欧氏空间上对数据进行生成建模，并利用该
+生成模型将心脏解剖信息融合到网络中，将HD和LD的数据在非欧氏空间进行转换。
+这种通过引入图卷积来解决之前TMP的重建工作忽略心脏的几何信息等问题。这个模型能够用一个LD的潜在编码来
+表示高分辨率组织特性，同时将几何知识纳入数据中，并可在几何结构之间传递。
+
+
+将心脏网格建模为图：\(\mathcal{G} =(\mathcal{V} ,\mathcal{E} ,U)\)，其中顶点\(\mathcal{V}\)由所
+有N个无网格节点组成，边
+\(\mathcal{E}\)存在于每个无网格节点及其k个最近邻居之间。\(U\in [0,1]^{NN3}\)由边
+缘属性
+\(v(i,j)\)组成，通过归一化如果边\((i,j)\in \mathcal{E}\)存在于
+\((x_1-x_2,y_1-y_2,z_1-z_2)\)处的
+顶点之间，否则为0。在这个图
+上，使用了基于空间连续卷积核的卷积算子，因为它被证明可以更好地推广到类似
+的图。特别给定图\(\mathcal{G}\)和M维输入特征\(f(i),i\in \mathcal{V}\) ，
+第\(l\)个卷积核为：
+\begin{equation}
+    g_l(v)=\sum_{p \in \mathcal{P}}w_{p,l}\prod N_{i,p_i}^{m}(v_i)
+\end{equation}
+其中\(((N{1,i}^m)_{1\leqslant i\leqslant k_1},...,(N_{d,i}^m)_{1\leqslant i\leqslant k_d})\)
+表示基于\(d\)维度核大小为\(k=(k_1,...,k_d)\)等距离节点向量的\(m\)次的\(d\)个开B样条基。
+\(\mathcal{P}\)是B样条基的笛卡尔积，\(w_{p,l}\)是可训练参数。给定内核函数
+\(\textbf{g}=(g_1,...,g_M)\)和输入特征\(f\in \mathcal{R^M}\)，每个顶点\(i\in \mathcal{V}\)
+的空间卷积算子和基于其边缘的连通性的具有领域的\(\mathcal{N}(i)\)被定义为：
+\begin{equation}
+    (\textbf{f}*\textbf{g})(i)=\frac{1}{\vert \mathcal{N}(i) \vert}
+    \sum_{l=1}^M \sum_{j\in \mathcal{N}(i)}f_l(j)g_l(v(i,j))
+    \label{eq:gjuanji}
+\end{equation}
+
+训练基于图的VAE的损失函数为：
+\begin{equation}
+    L(\alpha;\beta;\theta^{(i)})=-D_{KL}(q_{\alpha}(z|\theta^{(i)}))||p(z)+
+    E_{q_{\alpha (z|\theta^{(i)})}}[logp_{\beta}(\theta^{(i)}|z)]
+\end{equation}
+其中，\(q_{\alpha}(z|\theta)\)和\(p_{\beta}(\theta|z)\)是通过图卷积神经网络进行高斯分布的参数化。
+\(p(z)\)是符合标准正态分布的。
+\subsection{基于数学模型的深度学习方法}
+虽然目前在无创电生理成像领域传统方法和深度学习的方法都取得了重大成就，但是传统方法存在固有的人工选择参数问题，深度学习方法
+存在不可解释和需要海量训练数据等问题，这些原因限制了两类方法的方法发展。将传统的数学模型和深度学习发展相结合是目前
+无创生理成像的趋势\cite{cheng2021noninvasive}。
+
+重建TMP是逆问题，在第2.3.1章节中提到使用\(L_1\)正则化的方式约束目前函数，然后采用软阈值收缩算法(ISTA)等方法进行迭代求解。
+\begin{equation}
+    u_t^i=soft_{\lambda}(u_t^{i-1}-2\iota  H^T(Hu_t^{i-1}-\phi_t))
+    \label{eq:raunyuzhi}
+\end{equation}
+其中\(soft_{\lambda}(x)=sign(x)(abs(x)-\iota )\)，\(u_t^i\)表示第\(i\)次迭代，\(\iota \)表示梯度下降的
+步长，公\autoref{eq:raunyuzhi}是软阈值收缩算法每次迭代的公式，通过不断迭代
+这个公式最终重建出TMP。有学者提出在ISTA的基础上提出了ISTANet，并将之用在图像压缩领域，并且取得优秀的效果。GISTANet在
+ISTANet的基础上加入了图卷积并将它用在TMP重建上，给网络添加了心脏几何信息，加快了网络迭代的次数，提升了重建效果。这种结合数学模型和
+深度学习的方法可以统一两种方法的优点。但是这种基于目前函数正则化的方法没有很好的运用TMP的动态激活模型，忽略了时序的TMP信息，无法得到更好的重建精度。
+
+\chapter{数据仿真和心电正向数据处理}
+\section{数据仿真}
+% \subsection{软件介绍}
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=1\linewidth]{ecgsim.png}
+%     \caption{\label{fig:ecgsim}ECGsim软件界面图}
+% \end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{jiedian697.png}
+    \caption{\label{fig:jiegou1}仿真心脏躯干模型结构图}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{fangzhen.png}
+    \caption{异位起搏和心肌梗死仿真示意图。a的上半部分表示异位起搏的位置，下半部分表示异位起搏
+    点的时序TMP。b的上半部分表示心肌梗死的位置，下半部分表示完全心肌梗死的时序TMP}
+    \label{fig:fangzhen}
+\end{figure}
+本文基于ECGSIM软件生成仿真实验的数据。ECGSIM使用户能够研究心脏的电流源与产生的心电图
+信号和体表以及心脏表面的电位场之间的关系\cite{van2004ecgsim,van2011potential}。
+% \autoref{fig:ecgsim}展示了ECGSIM软件界面。
+
+在ECGSIM中，心脏源在电势场和信号方面的表达（所谓正向问题的处理）是在真实的体积导体模型中
+计算出来的，该模型考虑了心脏周围组织的三维表示中电流的扩散。图像显示了这些参数值在分别代表
+心房和心室心肌边界的2个闭合表面上的分布。
+% 由该源描述在心肌边界上以及体表上产生的电势可以以
+% 信号的形式（时间方面，即心电图和心电图）以及电压形式（空间方面）来观察。
+
+ECGSIM中使用的心脏电源由双变量模型表示，
+在界定心房心肌或心室心肌的闭合表面\(\Gamma_h\)上的源描述。
+双变量模型表达心肌内的电活动。
+
+% \subsection{仿真方法}
+\autoref{fig:jiegou1}展示本文仿真
+模型心脏躯干模型的几何结构，在心脏的模型表面有697个节点，有三个腔室，分别是左心室、右心室和右心室流出道。
+心脏异位起搏是指心脏异常部位最先起搏，TMP表现为
+心脏节点最先开始激活。根据临床经验，异位起搏多发生在右心室和右心室流出道附近，因本文将仿真
+起搏的位置集中在右心室和右心室流出道附近。
+心肌梗死表现为心脏不激活，
+TMP表现为无法达到完全激活状态。根据临床的经验，
+心肌梗死多发生在左右心室，因此在仿真数据时，心肌梗死的位置集中在左右心室。
+\autoref{fig:fangzhen}
+展示了本文仿真异位起搏和心肌梗死的电压分布以及对应病灶点的时序TMP波形(白色为正常波形)。
+
+
+\section{心电正向研究和临床数据处理}
+心电的正向模型是研究TMP重建的核心问题。本文建立从TMP到BSP的正向模型，计算出正向模型的转换矩阵\(H\)，
+得到的\(H\)越接近真实过程，进行TMP的重建精度越高。在过去几十年中，研究者经常会将简化心脏的模型为
+同心球或者偏心球模型\cite{johnston1997new,messinger1988regularization,rudy1979eccentric}。其中，
+同心球模型遵循人体中各向同性的假设，偏心球模型认为人体中介质存在不同导电率的情况。
+
+随着技术的进一步发展，简化的模型已经无法满足重建TMP的精度。研究者提出通过躯干心脏的CT和MRI影响精确地得到
+躯干和心脏的三维信息\cite{weixue1995three,johnston1997laplacian}。
+然后根据躯干的几何模型和心脏的几何模型就可以更加精确地得到心电的正向模型\cite{dubois2015non,ghanem2001imaging}。
+
+心脏几何空间模型使用细致的几何结构和高维度的网格结点来描述心脏电生理特性的三维分布细节。躯干模型在电生理成像的正向和反向
+过程中，几何空间结构相比于其材料特性是主导因素。
+\subsection{躯干建模}
+
+根据相关文献的说明，体表电位分
+布主要受心肌组织的材料特性和其各向异性的影响，躯干体积内的其它组织
+介质的非均匀性和电传导的各向异性对体表电位分布的影响则可以忽略不计。为了降低模型复杂度，
+简化组织各向异性或不均匀性的不必要限制的同时，需要保证几何建模的精确性。
+为了准确还原个性化躯干的几何结构，同时避免冗余测量引入的测量噪声和计算复杂性，本研究采用
+64导联电极来记录体表ECG，同时利用CT扫描记录64电极的位置，从而以电极所在位置为模型的表面
+结点坐标来建立个性化三维躯干模型。\autoref{fig:64daolian}展示了人体64导联电极分布图，导联背心
+由环绕躯干一周的列向分布的电极条组成，可以较准确地标记出个性化躯干的几何形状，为ECG逆成
+像问题提供支持。
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{daolian.png}
+    \caption{\label{fig:64daolian}64导联电极位置示意图}
+\end{figure}
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=1\linewidth]{slicer.png}
+%     \caption{\label{fig:slicer}3Dslicer软件界面图}
+% \end{figure}
+
+
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=1\linewidth]{scirun.png}
+%     \caption{\label{fig:slicer}scirun软件界面图}
+% \end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{quganjianmo.png}
+    \caption{\label{fig:quganjianmo}躯干建模流程示意图}
+\end{figure}
+躯干建模使用内
+部半自动程序在CT扫描图像上分割躯干。通过3DSlicer对采集的躯干CT进行电极标定，获得电极在心脏表面分布的
+二进制图像
+这些分割的二进制图像被用于构建躯干的三角形网格。\autoref{fig:quganjianmo}展示了建模的流程。
+3Dslicer是用于医学、生物医学和其他3D图像和网
+格的可视化、处理、分割、配准和分析;以及规划和导航图像引导的程序。
+% 桌面软件解决先进的图像计算挑战，重点是临床和生物医学应用。
+% 开发平台，使用免费的开源软件，为研究和商业产品快速构建和部署定制解决方案。
+% 由知识丰富的用户和开发人员组成的社区共同努力改进医疗计算。
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=1\linewidth]{jianmo.png}
+%     \caption{\label{fig:jianmo}临床数据处理流程图}
+% \end{figure}
+\subsection{心脏建模}
+
+
+
+患者特定心脏和躯干的解剖模型可以从计算机断层扫描（CT）扫描图像中获得。CT扫描产生一组图像
+，这些图像对应于沿着躯干的身体切片。如\autoref{fig:xinzangjianmo}所示，
+通过采取以下步骤，从CT图像构建3D双心
+室解剖模型。首先，提取沿着心室横截面（胸骨旁短轴）从心尖到心脏底部的一组图像。在这些图像上
+，心外膜、左心内膜和右心内膜使用内部半自动程序进行分割。然后利用由此获得的二值图像来获得
+三角形网格。使用工具包isotomesh将从三角形网格生成四面体网格。最后，在四面体网格上添加非结构化
+点云（无网格节点）来表示3D心肌体积。根据文献中所述的标准心室纤维结构数学模型，
+绘制了无网格节点上的纤维结构。\autoref{fig:xinzangjianmo}展示了心脏建模的过程。
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{xinzangjianmo.png}
+    \caption{\label{fig:xinzangjianmo}心脏建模流程示意图}
 \end{figure}
 
 
-\subsection{小节标题}
+\subsection{正向过程计算}
+根据麦克斯韦方程组的准静态近似，心脏到躯干的电场可以看做是准静电场，在遵循心脏到躯干之间是各向同性，然后
+采用数值计算的方法进行离散化求解。
+获得心脏和躯干的网格结果后本文对心脏和躯干进行配准。求解\(H\)矩阵的常用方法有：有限元(FEM)、边界元(BEM)
+及两种方法的混合\cite{1994Forward,1984Use}。但是这几种方法的适用条件不一样。FEM适合求解不规则的几何形状，它可以用于非均匀的人体躯干模型。
+BEM可以看做是特殊情况下的FEM\cite{pullan2001noninvasive}，它可以适用于少节点的情况，比FEM更加方便\cite{klepfer1995effects,fischer1999application,fischer1998analytical}。
+\autoref{fig:hjuzhen}展示了H矩阵计算流程。
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\linewidth]{hjuzhen.png}
+    \caption{\label{fig:hjuzhen}H矩阵计算流程示意图}
+\end{figure}
+
+\subsection{临床处理结果}
+\autoref{fig:lizi}展示了三组心脏异位起搏发生在右心室流出道位置的心电正向处理结果。\autoref{fig:h_inverse}
+展示了真实临床病人心脏的波前重建图和体表电位图。心脏波前重建图分别表示
+临床病人在心脏右心室流出道左侧、右心室间隔板和右心室右侧起搏。体表电位图
+分别表示各自对应的体表64导联心电图。
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{disanzhan.png}
+    \caption{\label{fig:lizi}患者CT数据正向处理结果}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{h_inverse.png}
+    \caption{\label{fig:h_inverse}真实心脏波前重建图和体表电位图}
+\end{figure}
+
+\let\cleardoublepage\clearpage
+\chapter{基于卡尔曼滤波的深度学习方法}
+\section{状态空间}
+在第二章节中提到了TMP动态激活模型，它描述了TMP的时序关系，本文根据\autoref{eq:twov}重新定义了
+状态转移方程的一般形式：
+\begin{equation}
+    u_t=f(u_{t-1})+\epsilon_t
+    \label{eq:newss}
+\end{equation}
 
 
-\par 如\autoref{tab:sample}所示，这是一张自动调节列宽的表格。
+由于上述方程是基于双变量方程的AP模型推导出，但是AP模型存在电压和电流两个变量，因此本文重新定义的状态
+转移方程\(f\)没有具体形式，本文将使用深度学习的模拟\(f\)。
+观测方程就是TMP经过躯干传导到体表的模型。
+因此心脏的状态空间为：
+\begin{equation}
+    \left\{
+    \begin{array}{lr}
+        u_t=f(u_{t-1})+\omega_t &\\
+        \phi_t=h(u_t)=Hu_t+\epsilon_t
+    \end{array}
+    \right.
+\end{equation}
+\section{卡尔曼滤波网络}
 
-\begin{table}[htbp]
-    \caption{\label{tab:sample}自动调节列宽的表格}
-    \begin{tabularx}{\linewidth}{c|X<{\centering}}
-        \hline
-        第一列 & 第二列 \\ \hline
-        xxx & xxx \\ \hline
-        xxx & xxx \\ \hline
-        xxx & xxx \\ \hline
-    \end{tabularx}
+% 卡尔曼滤波（Kalman Filter，KF）以贝叶斯滤波为理论基础，通过假设状态量随机变量
+% 、观测量均服从正态分布，假设过程噪声、观测噪声均服从均值为 0 的正态分布
+% ，以及假设状态转移函数和观测函数均为线性函数，实现对连续型随机过程的递推状态估
+% 计。简言之，卡尔曼滤波是在贝叶斯滤波框架下求解线性高斯问题。
+\subsection{贝叶斯理论}
+无创电生理成像重建TMP，是处理模型或数据的逆问题，是一种数学框架，从观测到的测量BSP中重建出状态TMP。
+这个问题的解决方案是有用的，因为它通常提供了人类不能直接观察到的物理参
+数的信息。相对于模型空间的维度或复杂性，观察结果可能在数量上受到限制\cite{2009Inverse,carrera2005inverse}。因此，逆问题是科学
+和数学中最重要的问题之一。经典的方法是使用正则化方法来施加良好的约束，并通过优化算法来解决
+由此产生的确定性问题。另一种方法是基于贝叶斯的方法\cite{tarantola2006popper,pizlo2001perception}，这是一种以先验信息形式进行正则化的自
+然机制。它可以处理估计的不确定性和估计的平均值\cite{fox2003bayesian,chen2003bayesian}，同时这种
+方法可以将TMP的正向模型和TMP的动态激活模型充分融合在一起，为重建TMP提供更多的先验信息。
+
+贝叶斯滤波具有三大概率密度函数，分别是：先验概率密度函数，似然概率密度函数和后验概率密度函数\cite{beutel2014cobafi}。
+贝叶斯推断\cite{box2011bayesian,kersten2004object}是指假设这些函数中未知参数和已知测量值都是随机变量，从给定的测量值BSP构造状态量TMP的概率
+分布的一般过程。可以从贝叶斯推断中推导贝叶斯滤波的公式。
+
+时序TMP的全概率公式：
+\begin{equation}
+    p(u_t)=\sum_{u_{t-1}=-\infty}^{\infty} p(u_t|u_{t-1})p(u_{t-1})
+    \label{eq:quangailv}
+\end{equation}
+
+在条件概率\cite{weigend1995predicting}中，条件可以作为已知参数，将公\autoref{eq:quangailv}转化为：
+\begin{equation}
+    p(u_t)=\sum_{u_{t-1}=-\infty}^{\infty} p(u_t-f(u_{t-1})|u_{t-1})p(u_{t-1})
+\end{equation}
+将求和取极限，
+根据\autoref{eq:newss}，可以转化为：
+\begin{equation}
+    p(u_t)=\int_{-\infty}^{\infty} p(\epsilon_t|u_{t-1})p(u_{t-1}) \,d u_{t-1}
+\end{equation}
+因为噪声\(\epsilon_t\)和\(u_{t-1}\)是相互独立的，公式将转化为：
+\begin{equation}
+    p(u_t)=\int_{-\infty}^{\infty} p(\epsilon_t)p(u_{t-1}) \,d u_{t-1}
+    \label{eq:si}
+\end{equation}
+
+通过公\autoref{eq:si}可以推导出最终的先验概率分布为：
+\begin{equation}
+    f{u_t^-}(u)=\int_{+\infty }^{\infty} f_{Q_t}[u_t^--f(u)]f_{\hat{u}_{t-1}}
+    (u) \,d u
+  \end{equation}
+\(f_{Q_t}\)表示噪声概率密度函数，\(u_t^-\)表示先验状态量,\(\hat{u}_t\)表示后验状态量.
+
+
+已知某一时刻的观测量\(\phi_t\)，
+根据\(u_t\)到\(\phi_t\)的转化关系，观测噪声\(R_t\)与状态量\(u_t\)独立还有条件概率的
+法则,可以得到似然概率密度函数：
+\begin{equation}
+    f_{\phi_t|u}(\phi_t|u)=f_{R_t}(\phi_t-h(u))
+\end{equation}
+\(f_{R_t}\)是观测噪声的概率密度函数。
+最后通过先验概率密度函数和似然概率密度函数可以推导出后验概率密度函数：
+
+\begin{equation}
+    f_{\hat{u}_t}(u) = \eta_t \cdot f_{R_t}(\phi_t-h(u)) \cdot f_{u_t^-}(u)
+\end{equation}
+其中，后验概率密度函数中的归一化参数\(\eta_t\)为：
+\begin{equation}
+    \eta_t=\{ \int_{+\infty}^{-\infty} f_{R_t}[\phi_t-h(u)]f_{u_t}^-(u)  \,du \}^{-1}
+    \label{eq:kg_1}
+\end{equation}
+
+\(f\)和\(h\)分别表示状态转移方程和观测方程。
+当贝叶斯滤波符合六个假设前提，将会变成卡尔曼滤波，\(\eta_t\)将会变成卡尔曼增益系数\(K_t\)。
+1.状态量服从正态分布，2.观测量服从正态分布，
+3.状态转移噪声服从标准正态分布，4.观测噪声服从标准正态分布，5.状态转移方程是线性函数，
+6.观测方程是线性函数。当贝叶斯滤波转化为卡尔曼滤波，\(\eta_t\)将会变成卡尔曼增益系数\(K_t\):
+\begin{equation}
+    K_t=P_t^-H^T(HP_t^-H^T+R_t)^{-1}
+    \label{eq:K}
+\end{equation}
+上述中，\(P_t^-\)是先验方差。可以从后验概率密度函数推出卡尔曼滤波的更新公式：
+\begin{equation}
+    \hat{u}_t=u_t^-+K_t(\phi_t-Hu_t^-)
+    \label{eq:updatek}
+\end{equation}
+\subsection{状态转移网络}
+
+公\autoref{eq:ss}中状态转移方程是非线性的，并且不可以局部线性化，采用广泛的
+卡尔曼滤波和集成卡尔曼滤波无法解决这个问题，在\cite{wang2009personalized}中作者提出的将蒙特卡罗和卡尔曼滤波算法结合的方法在一定程度上解决了非线性的动态转移方程
+的问题，但是在应用时，特定病人有特定的生理参数，并且状态量中存在非目标变量的传导电流，不利于目标重建的
+精度，本文提出建立
+新的状态转移方程\autoref{eq:newss}，但是它没有具体的形式，因此本文进一步提出使用深度学习的方法模拟
+TMP在心脏上的动态转移方程。
+
+为了传递TMP在时序上的关系，学习状态转移方程。本文使用多层的循环神经网络
+模型状态转移方程\cite{hewamalage2021recurrent,holm1991deep}。\autoref{fig:rnn}展示循环神经网络的原理图。
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{rnn.png}
+    \caption{\label{fig:rnn}循环神经网络示意图}
+\end{figure}
+
+传统的卷积神经网络无法网络记录时序信息，这是传统网络的缺陷所在。递归神经网络也称为循环神经网络(RNN)，
+可以学习数据中的时序信息。它使用递归的形式在时间点上进行迭代，可以让网络学习时序信息。
+循环神经网络的函数形式：
+\begin{equation}
+    u_t=f_{rnn}(\phi_t,u_{t-1})
+\end{equation}
+
+但是一般的循环神经网络(RNN)存在网络的长期记忆问题，随着时间轴的不断加长，RNN在进行反向梯度传播时会产生
+梯度消失或者梯度爆炸的问题。使用另一种循环神经网络门循环控制单元(GRU)可以解决网络的长期记忆问题。
+GRU模型中存在两个门单元，重置门和更新门\cite{fu2016using,dey2017gate}，原理公式：
+\begin{equation}
+    \left\{
+        \begin{array}{ll}
+            z_t=\sigma(W_z \cdot (h_{t-1},x_t)) &\\
+            r_t=\sigma(W_r\cdot (h_{t-1},x_t)) &\\
+            \hat{h}_t=tanh(W\cdot (r_t*h_{t-1},x_t)) &\\
+            h_t=(1-z_t)*h-{t-1}+z_t*\hat{h}_t
+        \end{array}
+    \right.
+\end{equation}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{gru.png}
+    \caption{\label{fig:gru}门循环单元结构图}
+\end{figure}
+\autoref{fig:gru}展示了GRU的内部结构。
+重置门\(r_t\)决定了如何将输入信息和前面网络记忆相结合，\(r_t\)值越小，网络对于前一时刻需要以忘记的
+信息越多，\(r\)值越大，当前时刻与之前时刻结合信息越多。
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{ss.png}
+    \caption{\label{fig:ssnet}状态转移网络。图中四个单元代表门循环单元。}
+\end{figure}
+更新门\(z_t\)用于控制前一时刻的状态信息与当前时刻的状态信息相结合，决定了多少过去的信息传递到未来。
+状态转移网络结构如\autoref{fig:ssnet}所示
+
+状态转移网络SSNet的具体结构：状态转移网络的输入是BSP，形状是(500,64),本文首先使用一个GRU将
+维度从64扩展到697，后面接着三个相同维度(都是697)GRU，并且每一层GRU后面有一个层归一化，用来
+控制网络在学习的过程中，保持中间特征的稳定，加快网络的收敛速度。状态转移网络的公式为：
+\begin{equation}
+    u_t^-=f_{ss}(u_{t-1}^-,\phi_t)
+    \label{eq:ssnet}
+\end{equation}
+上述中，\(f_{ss}\)表示状态转移网路SSNet，\(u_{t}^-\)表示t时刻的先验状态，\(u_{t-1}^-\)表示t-1时刻的先验状态。
+
+本文通过GRU学习状态转移方程可以解决两个问题：1、建立新的状态转移方程，将原始TMP动态激活模型中的传导电流消除；
+2、摆脱不同个体生理参数的特异性的限制。
+
+\subsection{卡尔曼增益网络}
+卡尔曼滤波迭代时必须选择合适的系统噪声矩阵\(Q\)
+和观测噪声矩阵\(R\)，通过调节这两个矩阵来使卡尔曼滤波算法收敛。但是BSP和TMP的
+维度过于庞大，导致\(P\)和\(R\)的维度也非常大，调节它们存在困难。
+卡尔曼增益系数是通过调节\(P\)和\(R\)后计算得到的，是平衡先验状态量和观测量的权重，
+在传统的卡尔曼滤波中是根据公\autoref{eq:K}计算得到的，
+本文提出通过深度学习的方法让网络自己学习出卡尔曼增益系数。
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{cnn.png}
+    \caption{\label{fig:cnn}卷积原理图}
+\end{figure}
+本文使用卷积神经网络作为基本的网络结构学习卡尔曼增益系数。
+\autoref{fig:cnn}展示了卷积原理，卷积神经网络通过中间的卷积核对网络的输入的特征图像滑动求和后产生新的特征。
+卷积神经网络具有局部感受野，可以充分提取数据的特征，具有参数共享的特点\cite{dey2017gate}。
+本文设计独特的卷积网络来学习卡尔曼增益系数。\autoref{fig:kg}展示了网络结构。
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{kg.png}
+    \caption{\label{fig:kg}卡尔曼增益学习网络。GRU是门循环单元，Conv是卷积神经网络，LN是层归一化，ReLu是激活函数。}
+\end{figure}
+
+根据公\autoref{eq:kg_1}，卡尔曼增益系数的计算与先验状态估计\(u_t^-\)和观测\(\phi_t\)有关，
+为了充分提取数据的特征，
+本文将\(\phi_t\)与\(u_t^-\)进行数据融合，即两者相乘得到\(z_t\)，然后通过多层卷积神经网络得到增益系数
+\begin{equation}
+    K_t=f_{kg}(z_t)
+\end{equation}
+上述中,\(\kappa\)代表了学习卡尔曼增益系数的网络KGNet。
+\(f_{kg}\)代表卡尔曼增益系数，\(z_t=\phi_t*u_t^-\)。KGNet包含了6个组卷积，每个组卷积可以保证输入和输出的特征大小一致，
+每个组卷积之后有归一化层(LN)和激活层，网络中还包含了残差结构用来抑制训练过程中发生梯度爆炸或者梯度消失等问题。
+
+本文提出通过卷积神经网络学习卡尔曼增益系数解决了卡尔曼滤波算法中需要人工调节噪声矩阵的问题，让网络自适应学习了
+卡尔曼增益系数。
+
+
+
+通过状态转移网络和卡尔曼增益网络得到两个输出，本文根据卡尔曼更新的公式得到最后的TMP估计：
+\begin{equation}
+    \hat{u}_t=f(u_{t-1}^-)+\kappa (z_t)(\phi_t-Hf(u_{t-1}^-))
+\end{equation}
+上述中，\(\hat{u}_t\)表示t时刻的后验状态。
+\autoref{fig:kf}展示了本文提出的方法整体的结构。
+本文提出的方法的整体结构是两个部分，首先BSP通过状态转移网络输出与最终
+TMP相同大小的先验估计TMP，然后将BSP与先验估计的TMP相乘得到融合后的特征图，将
+这个特征图通过本文设计的卷积网络得到卡尔曼增益系数，最后通过卡尔曼更新
+得到最后TMP的后验估计。
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\linewidth]{net.png}
+    \caption{\label{fig:kf}卡尔曼滤波网络整体结构图。Initialize代表将数据从bsp维度映射到tmp的维度，KF update表示通过卡尔曼更新公式。}
+\end{figure}
+损失函数:在建立损失函数需要考虑两个要求。首先，为了保证状态转换
+方程的准确性。然后，要确保
+更新结果接近真实情况。由于这些原因，损失函数
+设计为这两个部分损失函数的叠加：
+\begin{equation}
+    Loss=\frac{1}{F}\sum_{t=1}^{F} \Vert\hat{u}_t-u_t \Vert_2^2+\alpha \Vert u_t^--u_t \Vert_2^2
+    \label{eq:loss}
+\end{equation}
+上述中，\(u_t\)表示t时刻的TMP的真值，\(\alpha\)表示权重系数。
+\section{实验验证}
+\subsection{实验设置}
+为了验证所提出的KFNet的有效性，本文将
+从三个方面进行了实验验证。1、在心脏异位起搏、心肌梗死及激活时间上验证本文的方法；2、鲁棒性和泛化性实验验证
+本文提出的KFNet算法的抗噪声能力和泛化能力；3、
+消融实验验证本文提出通过网络学习卡尔曼增益系数的有效性。
+将本文提出的KFNet
+与Tikhonov正则化、TV和VAENet进行比较，并且计算各项方法重建的结果的评价指标，对重建结果进行
+线性回归分析，分析各项指标
+的异常情况。
+
+实验结果用三个评价指标来衡量:1)相关系数(CC):它描述了
+真值与预测结果之间的相关性;2)结构相似性
+(SSIM):它评估真实图像和图像之间的结构相似性，
+即TMP真值与TMP重建结果的相似性;3)定位误差(LE):
+通过计算异位起搏点的欧几里得距离对定位精度进行评估。定量指标计算公式如下：
+\begin{equation}
+    \begin{array}{ll}
+        CC=\frac{Cov(u_{gt},\hat{u})}{\sqrt{Var(u_{gt})}\sqrt{Var(\hat{u})}} &\\
+        SSIM=\frac{(2E(u_{gt})E(\hat{u})+c_1)(2Cov(u_{gt},\hat{u})+c_2)}{(E(u_{gt})^2+E(\hat{u})^2+c_1)
+        (Var(u_{gt}+Var(\hat{u})+c_2))} &\\
+     \end{array}
+\end{equation}
+
+其中，\(u_{gt}\)和\(\hat{u}\)分别表示TMP的真值和重建结果，\(Cov(u_{gt},\hat{u})\)表示
+真值和重建结果的协方差，\(Var(u_{gt})\)和\(Var(\hat{u})\)分别表示真值和重建结果的方差，\(E(u_{gt})\)和
+\(E(\hat{u})\)分别表示真值和重建结果的均值。\(c_1\)和\(c_2\)是避免计算结构相似度时分母为0。
+
+实验数据由ECGsim软件生成
+。共模拟1200例受试者，其中异位起搏600例
+和600例心肌梗死。在异位起搏部位
+任务中，500例用于模型训练，100例用于模型
+测试。同时，保证异位起搏的所有位置
+情况不重复，并设置完全激活TMP为15mv和
+静息TMP为-85mv。在心肌梗死检测任务中，500例
+用于模型训练，100例用于模型测试。在
+同时，本文确保所有病例的心肌梗死区域都没有发生
+心肌梗死区TMP值设为−85 mv，
+为了方便网络训练，本文以500帧为一个样本,并且将TMP放缩到-1到1，然后将处理之后的
+TMP乘以系统矩阵\(H\)得到网络的输入BSP。最终网络输入的shape是(500,64)，输出的shape是(500,697)。
+
+本章中的深度学习训练和测试都是在python3.8和pytorch1.10.0下进行的，训练采用的显卡配是TITANRTX，显卡显存
+为24G。训练时的配置是：初始学习率为0.001，训练epoch为1000次，一次训练采用500帧TMP，优化器采用
+Adam优化器和SGD优化器混合训练。
+\subsection{异位起搏实验}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{ep.png}
+    \caption{\label{fig:epdianya}Tikhonov，TV，VAE和KFNet四种不同方法重建心脏
+    异位起搏电压分布图。红色代表心肌细胞激活区域，蓝色代表的心肌细胞处于
+    静息电位状态。}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{eptime.png}
+    \caption{\label{fig:eptime}Tikhonov，TV，VAE和KFNet四种不同方法重建心脏
+    异位起搏点的时序图}
+\end{figure}
+心脏跨膜电位在诊断心脏异位起搏上有着重要的作用，因为心脏异位起搏时，心肌跨膜电位会在异位起搏的
+位置最先激活，即从静息状态到激活状态，本文可以从TMP重建的电压分布图看出心脏起搏的位置。
+本章节是为了验证本文提出的方法在判断心脏异位起搏上的效果，将本文的方法和Tikhonov，TV，VAE进行了对比。
+心脏异位起搏经常发生在右心室流出道附近，本文在分别在右心室流出道，右心室前侧和右心室左侧进行验证。
+
+\autoref{fig:epdianya}显示三例心脏异位起搏的波前重建结果。心脏红色的部分代表心肌细胞激活的区域，蓝色
+部分代表心肌细胞处于静息状态。可以看到Tikhonov重建的结果在起搏边缘的部分非常模糊，这是因为Tikhonov是
+基于\(L_2\)范数正则化的，会对重建的结果产生平滑效果。虽然TV的方法在边缘的程度上要优于Tikhonov，但是因为
+TV是基于\(L_1\)范数正则化的，也会在边缘产生模糊。VAE是通过学习隐空间的分布来重建TMP，它在重建起搏边缘的
+效果上明显要优于TV和Tikhonov，例如Case 3。但是由于它缺少生理模型上的先验信息，它重建的结果仍然存在一些
+噪点和模糊的区域。相比于TV，Tikhonov和VAE，本文提出的方法明显在重建的精度上要高于它们，起搏的边缘更加清晰。
+
+从\autoref{fig:epdianya}的电压分布图中，本文可以在视觉上大致判断出起搏的位置和边缘区域，所以
+为了更加准确地评价本文提出的方法在定位心脏异位起搏上的情况，
+本文对起搏区域进行了定量评价，计算了CC，SSIM和LE。
+根据
+\autoref{tab:epdianya}，可以看出相比于传统方法，本文提出的方法在指标上提升很大，相比于深度学习地VAE
+算法，本文的方法在指标上也略有提升。指标LE衡量了确定异位起搏点的精度，本文提出的方法在定位异位起搏上精度达到了10.5mm，相比于Tikhonov和TV的定位
+精度提升很大。
+
+% \begin{table}
+%     \centering
+%     \caption{异位起搏波前统计分析表}
+%     \begin{tabular}{|c|c|c|c|}
+%     \hline
+%     \makebox[0.2\textwidth][c]{Methods} & \makebox[0.2\textwidth][c]{CC}        & \makebox[0.2\textwidth][c]{SSIM}     & \makebox[0.2\textwidth][c]{LE}        \\ \hline
+%     Tikhonov                      & 0.65±0.02 & 0.70±0.06 & 15.1±11.6 \\ \hline
+%     TV                            & 0.61±0.03 & 0.65±0.04 & 20.3±10.7 \\ \hline
+%     VAENet                        & 0.65±0.03 & 0.71±0.02 & 11.1±7.2  \\ \hline
+%     KFNet                         & 0.66±0.03 & 0.72±0.03 & 10.5±7.7  \\ \hline
+%     \end{tabular}
+%     \label{tab:epdianya}
+% \end{table}
+\begin{table}
+    \centering
+    \caption{Tikhonov，TV，VAE和KFNet四种不同方法重建心脏
+    异位起搏的TMP与真值之间的CC,SSIM和LE}
+    \begin{tabular}{cccc}
+    \Xhline{2pt}
+    \makebox[0.2\textwidth][c]{方法} & \makebox[0.2\textwidth][c]{CC}        & \makebox[0.2\textwidth][c]{SSIM}     & \makebox[0.2\textwidth][c]{LE}        \\ \hline
+    Tikhonov                      & 0.65 & 0.70 & 15.1 \\ 
+    TV                            & 0.61 & 0.65 & 20.3 \\ 
+    VAENet                        & 0.65 & 0.71 & 11.1  \\ 
+    KFNet                         & 0.66 & 0.72 & 10.5  \\ \Xhline{2pt}
+    \end{tabular}
+    \label{tab:epdianya}
 \end{table}
 
 
-\par 如\autoref{equ:sample}，这是一个公式
 
-\begin{equation}
-    \label{equ:sample}
-    A=\overbrace{(a+b+c)+\underbrace{i(d+e+f)}_{\text{虚数}}}^{\text{复数}}
-\end{equation}
+因为TMP是时序信号，所以本文不仅要在空间域分析心脏异位起搏的病例还要在时间域进行分析。
+\autoref{fig:eptime}显示了Tikhonov，TV，VAE和KFNet四种不同方法重建心脏
+异位起搏点的时序图。Tikhonov和TV在起搏阶段重建的TMP波形与真实的TMP
+波形相差较大，并且起搏速度较慢。VAE和本文提出的方法起搏阶段重建的波形更符合真实值，起搏速度和真实TMP
+相似，但是在后续恢复到静息电位时，VAE相比本文提出的方法变化较大。
 
-\chapter{另一章}
-
-
-\begin{figure}[htbp]
+为了更明显看出真值和重建结果的区别，本文计算了它们的误差图。
+\autoref{fig:eptimeerror}显示了Tikhonov，TV，VAE和KFNet四种不同方法重建心脏
+异位起搏点的时序误差图。TV和Tikhonov无论是在静息状态还是在激活状态，它们重建的异位起搏点时序信号
+都与真值相差较大。而VAE和本文提出的方法，虽然在开始激活时间段误差较大，但是持续时间较短，并且本文
+提出的方法在从激活状态恢复到静息状态这段时间，重建的结果与真值差距很小。
+\begin{figure}
     \centering
-    \includegraphics[width=.3\linewidth]{example-image-a}
-    \caption{\label{fig:fig-placeholder}图片占位符}
+    \includegraphics[width=0.6\linewidth]{eptimeerror.png}
+    \caption{\label{fig:eptimeerror}Tikhonov，TV，VAE和KFNet四种不同方法重建心脏
+    异位起搏点的时序误差图}
 \end{figure}
 
-\chapter{再一章}
 
-\par 如\autoref{alg:sample}，这是一个算法
+% \begin{table}[]
+%     \centering
+%     \caption{Tikhonov，TV，VAE和KFNet四种不同方法重建心脏
+%     异位起搏点的TMP与真值之间的\(CC\),\(SSIM\)}
+%     \begin{tabular}{|c|c|c|}
+%     \hline
+%     \makebox[0.3\textwidth][c]{Methods} & \makebox[0.3\textwidth][c]{CC}        & \makebox[0.3\textwidth][c]{SSIM}     \\ \hline
+%     Tikhonov & 0.86±0.02 & 0.96±0.02 \\ \hline
+%     TV       & 0.85±0.06 & 0.90±0.07 \\ \hline
+%     VAENet   & 0.95±0.02 & 0.97±0.03 \\ \hline
+%     KFNet    & 0.96±0.05 & 0.98±0.01 \\ \hline
+%     \end{tabular}
+% \end{table}
+\begin{table}[]
+    \centering
+    \caption{Tikhonov，TV，VAE和KFNet四种不同方法重建心脏
+    异位起搏点的TMP与真值之间的CC,SSIM}
+    \begin{tabular}{ccc}
+    \Xhline{2pt}
+    \makebox[0.3\textwidth][c]{方法} & \makebox[0.3\textwidth][c]{CC}        & \makebox[0.3\textwidth][c]{SSIM}     \\ \hline
+    Tikhonov & 0.86 & 0.96 \\ 
+    TV       & 0.85 & 0.90 \\ 
+    VAENet   & 0.95 & 0.97 \\ \
+    KFNet    & 0.96 & 0.98 \\ \Xhline{2pt}
+    \end{tabular}
+    \label{tab:eptime}
+\end{table}
 
-\begin{algorithm}[H]
-    \begin{algorithmic} % enter the algorithmic environment
-        \REQUIRE $n \geq 0 \vee x \neq 0$
-        \ENSURE $y = x^n$
-        \STATE $y \Leftarrow 1$
-        \IF{$n < 0$}
-            \STATE $X \Leftarrow 1 / x$
-            \STATE $N \Leftarrow -n$
-        \ELSE
-            \STATE $X \Leftarrow x$
-            \STATE $N \Leftarrow n$
-        \ENDIF
-        \WHILE{$N \neq 0$}
-            \IF{$N$ is even}
-                \STATE $X \Leftarrow X \times X$
-                \STATE $N \Leftarrow N / 2$
-            \ELSE[$N$ is odd]
-                \STATE $y \Leftarrow y \times X$
-                \STATE $N \Leftarrow N - 1$
-            \ENDIF
-        \ENDWHILE
-    \end{algorithmic}
-    \caption{\label{alg:sample}算法样例}
-\end{algorithm}
+为了在时间域分本文的方法在重建心脏异位起搏病例上的效果，本文计算了
+Tikhonov，TV，VAE和KFNet四种不同方法重建心脏
+异位起搏点的TMP与真值之间的\(CC\),\(SSIM\)。
+\autoref{tab:eptime}显示的时四种方法的对比，可以看到无论是TV还是Tikhonov在指标
+CC和SSIM都是要低于VAE和本文提出的方法，而本文的方法在指标上是要优于
+VAE的。
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{epfangcha.png}
+    \caption{\label{fig:epfangchang}Tikhonov，TV，VAE和KFNet四种不同方法重建心脏
+    异位起搏在空间域指标CC和SSIM的箱型图}
+\end{figure}
+
+从\autoref{fig:epfangchang}，本文无法判断出异常重建病例的异常情况。
+本文进一步对异位起搏病例进行统计分析，分析评价指标CC和SSIM的异常点，
+可以从\autoref{fig:epfangchang}看到本文提出的方法与TV相比拥有
+更少的异常点。虽然在异常点的分析上，Tikhonov异常点较少，但是本文的方法在指标的
+均值和方差上要优于Tikhonov。本文提出的方法在异常点分析上优于VAE，并且在指标的均值和方差上要优于
+VAE。
+\subsection{心肌梗死实验}
+心肌梗死是由于心肌缺血等原因而导致的心肌细胞坏死，从而导致心脏电生理活动表现异常，在心肌跨膜电位上表示为
+心肌跨膜电位不激活或者说激活不明显。本章主要是为了验证
+本文的方法相比于TV，Tikhonov和VAE在不同位置心肌梗死病例的重建效果。
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{in.png}
+    \caption{\label{fig:midianya}Tikhonov，TV，VAE 和 KFNet 四种不同方法重建心肌梗死电压分布图。红色代表心肌
+    细胞激活区域，蓝色代表的心肌细胞处于静息电位状态，这里代表心肌梗死的区域。}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{mitime.png}
+    \caption{\label{fig:mitime} Tikhonov，TV，VAE 和 KFNet四种不同方法重建心肌梗死区域的时序图}
+\end{figure}
+\autoref{fig:midianya}展示了Tikhonov，TV，VAE 和 KFNet 四种不同方法重建心肌梗死电压分布图。红色代表心肌
+细胞激活区域，蓝色代表的心肌细胞处于静息电位状态，这里代表心肌梗死的区域。本文设置梗死的区域位于左心室右侧，
+右心室流出道右侧和右心室流出道间隔侧。
+因为心肌梗死的诊断在于定位区域和判断出梗死的边界，所以重建出心肌梗死具体的形状非常重要。\autoref{fig:midianya}显示
+TV和Tikhonov重建的TMP可以定位出梗死的区域，但是在梗死的边缘即低电压区和高电压区的交界处非常模糊，这是因为这两种
+方法分别是基于\(L_1\)范数正则化和\(L_2\)范数正则化的，在梯度较大的区域图像会出现平滑的效果。VAE和本文提出的方法在重加
+出心肌梗死区域和形状的效果上要优于TV和Tikhonov，例如在Case 1中，本文提出的的方法重建的心肌梗死的边缘非常清晰。
+但是从Case 2和Case 3中可以看到本文提出的方法与VAE相比存在更少的噪点，因此本文的方法在重建心肌梗死的区域和形状
+上效果最好。
+
+% \begin{table}[]
+%     \centering
+%     \caption{Tikhonov，TV，VAE 和 KFNet 四种不同方法重建心肌梗死区域的TMP与真值之间的
+%     CC,SSIM}
+%     \begin{tabular}{|c|c|c|}
+%     \hline
+%     \makebox[0.3\textwidth][c]{Methods} & \makebox[0.3\textwidth][c]{CC}        & \makebox[0.3\textwidth][c]{SSIM}     \\ \hline
+%     Tikhonov & 0.61±0.02 & 0.71±0.02 \\ \hline
+%     TV       & 0.60±0.06 & 0.65±0.07 \\ \hline
+%     VAENet   & 0.69±0.02 & 0.74±0.03 \\ \hline
+%     KFNet    & 0.70±0.05 & 0.75±0.01 \\ \hline
+%     \end{tabular}
+% \end{table}
+\begin{table}[]
+    \centering
+    \caption{Tikhonov，TV，VAE 和 KFNet 四种不同方法重建心肌梗死区域的TMP与真值之间的
+    CC,SSIM}
+    \begin{tabular}{ccc}
+    \Xhline{2pt}
+    \makebox[0.3\textwidth][c]{方法} & \makebox[0.3\textwidth][c]{CC}        & \makebox[0.3\textwidth][c]{SSIM}     \\ \hline
+    Tikhonov & 0.61 & 0.71 \\ 
+    TV       & 0.60 & 0.65 \\ 
+    VAENet   & 0.69 & 0.74 \\ 
+    KFNet    & 0.70 & 0.75 \\ \Xhline{2pt}
+    \end{tabular}
+    \label{tab:midianya}
+\end{table}
+
+从\autoref{fig:midianya}的电压分布图中，只可以从视觉上大致判断出心肌梗死的位置和边缘区域，所以
+为了更加准确地评价本文提出的方法在重建心肌梗死区域上的情况，
+本文对起搏区域进行了定量评价，计算了CC和SSIM。
+根据
+\autoref{tab:midianya}，可以看出相比于传统方法，本文提出的方法在指标上提升很大，相比于深度学习VAE
+算法，本文的方法在指标上也略有提升。
+
+TMP是时序信号，所以本文不仅要在空间域分析心肌梗死的病例还要在时间域进行分析。
+\autoref{fig:mitime}显示了Tikhonov，TV，VAE和KFNet四种不同方法重建心脏
+异位起搏点的时序图。Tikhonov和TV在起搏阶段重建的TMP波形与真实的TMP
+波形相差较大，并且起搏速度较慢。VAE和本文提出的方法起搏阶段重建的波形更符合真实值，起搏速度和真实TMP
+相似，但是在后续恢复到静息电位时，VAE相比本文提出的方法变化较大。
+
+为了更明显看出真值和重建结果的区别，本文计算了它们的误差图。
+\autoref{fig:mitimeerror}显示了Tikhonov，TV，VAE和KFNet四种不同方法重建心脏
+异位起搏点的时序误差图。TV和Tikhonov无论是在静息状态还是在激活状态，它们重建的异位起搏点时序信号
+都与真值相差较大。而VAE和本文提出的方法，虽然在开始激活时间段误差较大，但是持续时间较短，并且本文
+提出的方法在从激活状态恢复到静息状态这段时间，重建的结果与真值差距很小。
+
+
+为了在时间域分析本文的方法在重建心肌梗死病例上的效果，本文计算了
+Tikhonov，TV，VAE和KFNet四种不同方法重建心肌梗死时序TMP与真值之间的\(CC\),\(SSIM\)。
+\autoref{tab:mitime}显示的时四种方法的对比，可以看到无论是TV还是Tikhonov在指标
+\(CC\)和\(SSIM\)都是要低于VAE和本文提出的方法，而本文的方法在指标上是要优于
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\linewidth]{mitimeerror.png}
+    \caption{\label{fig:mitimeerror}Tikhonov，TV，VAE和KFNet四种不同方法重建心肌梗死的时序误差图}
+\end{figure}
+VAE的。相比于在重建心脏异位起搏点的时序TMP，重建心肌梗死区域的时序TMP的精度有降低，主要的原因是
+因为异位起搏的整体时序波形是符合TMP的正常波形，但是心肌梗死是因为心肌细胞不能传导电信号，波形与正常的TMP时序波形
+区别很大，比较难学习到它的波形分布。
+
+\begin{table}[]
+    \centering
+    \caption{Tikhonov，TV，VAE和KFNet四种不同方法重建心肌梗死区域的时序TMP与真值之间的
+    CC,SSIM}
+    \begin{tabular}{ccc}
+    \Xhline{2pt}
+    \makebox[0.3\textwidth][c]{方法} & \makebox[0.3\textwidth][c]{CC}        & \makebox[0.3\textwidth][c]{SSIM}     \\ \hline
+    Tikhonov & 0.84& 0.88 \\ 
+    TV       & 0.85 & 0.87 \\ 
+    VAENet   & 0.87 & 0.89 \\ 
+    KFNet    & 0.88 & 0.91 \\ \Xhline{2pt}
+    \end{tabular}
+    \label{tab:mitime}
+\end{table}
+% \begin{table}[]
+%     \centering
+%     \caption{心肌梗死时序统计表}
+%     \begin{tabular}{|c|c|c|}
+%     \hline
+%     \makebox[0.3\textwidth][c]{Methods} & \makebox[0.3\textwidth][c]{CC}        & \makebox[0.3\textwidth][c]{SSIM}     \\ \hline
+%     Tikhonov & 0.86±0.02 & 0.91±0.02 \\ \hline
+%     TV       & 0.85±0.06 & 0.90±0.07 \\ \hline
+%     VAENet   & 0.94±0.02 & 0.96±0.03 \\ \hline
+%     KFNet    & 0.95±0.05 & 0.99±0.01 \\ \hline
+%     \end{tabular}
+% \end{table}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{infangcha.png}
+    \caption{\label{fig:mifangcha}Tikhonov，TV，VAE和KFNet四种不同方法重建心肌梗死在空间域指标CC和SSIM的箱型图}
+\end{figure}
+从\autoref{fig:mifangcha}，本文无法判断出异常重建病例的异常情况。
+本文进一步对异位起搏病例进行统计分析，分析评价指标CC和SSIM的异常点，
+可以从\autoref{fig:mifangcha}看到本文提出的方法与TV相比拥有
+更少的异常点。虽然在异常点的分析上，Tikhonov异常点较少，但是本文的方法在指标的
+均值和方差上要优于Tikhonov。本文提出的方法在异常点分析上优于VAE，并且在指标的均值和方差上要优于
+VAE。
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\linewidth]{xianxin.png}
+    \caption{\label{fig:xianxin}Tikhonov，TV，VAE 和 KFNet四种不同方法重建TMP的线性回归分析图}
+\end{figure}
+
+为了衡量本文提出的方法在不同电压下的重建效果。
+本文对Tikhonov，TV，VAE和KFNet四种不同方法重建TMP上进行了线性回归分析。
+\autoref{fig:xianxin}表示在Tikhonov，TV，VAE和KFNet四种不同方法重建TMP的回归分析。Tikhonov重建的结果均匀分布在y=x的两边，TV重建的
+结果分布比较分散，VAE重建的结果在平均电位较大时出现严重偏离\(y=x\)的情况。本文提出的重建方法
+十分逼近\(y=x\)，从回归分析中本文提出的方法不论在TMP处于低电位还是高电位重建的效果都比较好。
+
+\subsection{心脏异位起搏和心肌梗死混合实验}
+
+目前，在临床中存在多种病例同时出现的情况，即在同一个病人身上出现异位起搏和心肌梗死是存在的，
+为了更加符合临床的研究，本文将提出的方法在同时存在心肌梗死和异位起搏的病例上进行了实验。
+\autoref{tab:hunhe}展示了
+Tikhonov，TV，VAE和KFNet四种不同方法重建混合病例的TMP与真值之间的
+CC,SSIM。与单一出现心脏异位起搏和心肌梗死重加效果相比，同时出现异位起搏和心肌梗死会降低重建的效果，但是
+本文提出的方法也在四种方法中取得最优的重建结果。
+
+\begin{table}
+    \centering
+    \caption{Tikhonov，TV，VAE和KFNet四种不同方法重建混合疾病时TMP与真值之间的
+    CC,SSIM}
+    \begin{tabular}{ccc}
+    \Xhline{2pt}
+    \makebox[0.2\textwidth][c]{方法}       & \makebox[0.3\textwidth][c]{CC}   & \makebox[0.3\textwidth][c]{SSIM} \\ \hline
+    Tikhonov & 0.60 & 0.55 \\ 
+    TV       & 0.62 & 0.59 \\
+    VAE      & 0.65 & 0.63 \\ 
+    KFNet    & 0.66 & 0.60 \\ \Xhline{2pt}
+    \end{tabular}
+    \label{tab:hunhe}
+\end{table}
+
+\subsection{激活时间实验}
+
+激活时间在临床上有非常重大的作用，它反应了心脏动态的激活顺序，通常医生在进行手术时，都
+会通过工具来手动定位最早的激活时间，这个定位可以帮助医生作为治疗病人的依据。
+而且通常因为时间的限制医生也只能找出几个点的顺序，不可以
+从全局观察心脏的点传导过程。因此重建激活时间序列在辅助医生治疗上非常重要。
+本文计算出重建
+TMP在每个心脏节点达到完全激活状态的时间，即为激活时间。
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{ac.png}
+    \caption{\label{fig:ac}Tikhonov，TV，VAE 和 KFNet四种不同方法重建心脏的激活时间图。蓝色代表最先开始
+    的激活为位置，红色代表最后激活的位置}
+\end{figure}
+
+\autoref{fig:ac}展示了Tikhonov，TV，VAE 和 KFNet四种不同方法重建心脏的激活时间图。蓝色代表最先开始
+的激活为位置，红色代表最后激活的位置。图中Case 1是从右心室流出道前侧开始激活，逐渐传导到右心室心尖位置，
+TV和Tikhonov重建的结果仅仅能看清心脏大致的激活顺序，即最开始激活的心脏节点和最后激活的心脏节点，
+但是与真值
+相比激活时间的细节相差较大。
+\begin{table}
+    \centering
+    \caption{Tikhonov，TV，VAE和KFNet四种不同方法重建激活时间的结果与真值之间的
+    CC,SSIM}
+    \begin{tabular}{ccc}
+    \Xhline{2pt}
+    \makebox[0.2\textwidth][c]{方法}       & \makebox[0.3\textwidth][c]{CC}   & \makebox[0.3\textwidth][c]{SSIM} \\ \hline
+    Tikhonov & 0.65 & 0.68 \\ 
+    TV       & 0.62 & 0.60 \\ 
+    VAE      & 0.70 & 0.71 \\ 
+    KFNet    & 0.70 & 0.73 \\ \Xhline{2pt}
+    \end{tabular}
+    \label{tab:ac}
+\end{table}
+
+为了定量评价本文提出的KFNet在重建激活时间上的效果，本文计算了Tikhonov，TV，VAE和KFNet四种不同方法重建激活时间的结果与真值之间的
+CC,SSIM，并且展示在\autoref{tab:ac}中，可以从表格中明显看出传统方法重建激活时间的指标要远远低于
+深度学习的方法。本文的方法在四种方法中取得最优的重建效果。
+
+\subsection{消融实验}
+本小节是为了验证本文提出通过深度学习的方法学习卡尔曼增益系数的有效性而进行的一个消融实验。
+在实验中本文对比了两种方法：1.SSNet(没有加卡尔曼增益系数学习网络)；2.KFNet。本文分别在空间域和
+时间域分析两种算法的效果。
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{ab.png}
+    \caption{\label{fig:ab}SSNet和KFNet重建TMP的电压图。从左到右分别是
+    第一帧，第二十帧，第四十帧和第六十帧的电压图。}
+\end{figure}
+\autoref{fig:ab}展示了SSNet和KFNet重建TMP的电压图。从左到右分别是
+第一帧，第二十帧，第四十帧和第六十帧的电压图。红色是激活的心肌细胞，蓝色是没有激活的心肌细胞。
+本文可以看到在最开始时出现激活的位置，SSNet重建的
+结果较为模糊，存在细节上的缺失，随着时间不断变化，虽然重建的区域逐渐清晰，
+但是在一些细节的
+地方还是不如KFNet。从空间域定性分出本文所提出的KFNet学习卡尔曼增益系数可以提升TMP重建效果。
+
+% \begin{table}[]
+%     \centering
+%     \caption{消融实验统计分析表}
+%     \begin{tabular}{|c|c|c|}
+%     \hline
+%     \makebox[0.2\textwidth][c]{方法}       & \makebox[0.3\textwidth][c]{CC}   & \makebox[0.3\textwidth][c]{SSIM}      \\ \hline
+%     SSNet   & 0.62±0.08 & 0.74±0.10 \\ \hline
+%     KFNet   & 0.70±0.05 & 0.75±0.01 \\ \hline
+%     \end{tabular}
+% \end{table}
+\begin{table}[]
+    \centering
+    \caption{SSNet和KFNet重建TMP的空间域指标分析表}
+    \begin{tabular}{ccc}
+    \Xhline{2pt}
+    \makebox[0.2\textwidth][c]{方法}       & \makebox[0.3\textwidth][c]{CC}   & \makebox[0.3\textwidth][c]{SSIM}      \\ \hline
+    SSNet   & 0.62 & 0.74 \\ 
+    KFNet   & 0.70 & 0.75 \\ \Xhline{2pt}
+    \end{tabular}
+    \label{tab:ab}
+\end{table}
+
+从\autoref{fig:ab}中，本文仅仅可以从视觉上判断出本文提出的KFNet的优势，为了更加准确地评价本文提出的通过深度学习的方法
+学习卡尔曼增益系数的有效性，本文计算了SSNet和KFNet重建的空间域指标。\autoref{tab:ab}展示了SSNet和KFNet重建的空间域评价指标，
+可以看到KFNet在CC和SSIM上都是大于SSNet的CC和SSIM。
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{abtime.png}
+    \caption{\label{fig:abtime}SNet和KFNet重建TMP的起搏点的时序波形图和时序波形误差图}
+\end{figure}
+
+TMP是时序信号，本文从TMP的时序波形分析本文提出的KFNet的优势。在\autoref{fig:abtime}中的第一行，可以看到在心肌组织开始起搏时
+即TMP开始
+升高时，本文方法重建的TMP更加靠近真实值，并且存在更小的抖动，从完全激活状态恢复到静息电位
+也更加平滑。\autoref{fig:abtime}的第二行显示的是时序波形误差图，可以看到KFNet重建的TMP误差更加稳定并且更靠近0.
+\subsection{鲁棒性和泛化性实验}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{kftmp_noise.png}
+    \caption{\label{fig:kftmp_noise}在BSP中加入0dB，10dB，20dB，30dB高斯白噪声下不同病例第十号心脏节点的TMP波形图}
+\end{figure}
+
+在实际临床中，由于设备等环境原因，体表信号必然存在高斯噪声，因此为了更加
+符合临床的研究，本文在BSP中加入0dB（无噪声）、10dB、20dB、30dB高斯白噪声。
+\autoref{fig:kftmp_noise}显示了在BSP中加入高斯噪声不同病例的第十号心脏节点的重建TMP时序波形，
+第一列是0dB，第二列是10dB，第三列是20dB，第四列是30dB。从图中可以看出，随着噪声的增大，本文提出方法
+重建的效果变化较为稳定。
+\begin{table}[]
+    \centering
+    \caption{在BSP中加入0dB（无噪声）、10dB、20dB、30dB高斯白噪声下重建的TMP与真值之间的CC、SSIM}
+    \begin{tabular}{ccc}
+    \Xhline{2pt}
+    \makebox[0.2\textwidth][c]{噪声(dB)} & \makebox[0.2\textwidth][c]{CC}   & \makebox[0.2\textwidth][c]{SSIM} \\ \hline
+    0      & 0.75 & 0.72 \\ 
+    10     & 0.69 & 0.68 \\
+    15     & 0.73 & 0.70 \\ 
+    20     & 0.74 & 0.72 \\ \Xhline{2pt}
+    \end{tabular}
+    \label{tab:kftmp_noise}
+\end{table}
+\autoref{tab:kftmp_noise}展示了在BSP中加入噪声的定量分析结果，可以看出本文提出的KFNet随着
+加入噪声的增大，CC和SSIM指标下降较小。
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{kfh_noise.png}
+    \caption{\label{fig:kfh_noise}在H矩阵中加入0dB，30dB，40dB，50dB高斯白噪声下不同病例第十号心脏节点的TMP波形图}
+\end{figure}
+实验中训练和测试数据是基于临床病人的心脏躯干模型仿真得到的，不同病人的个性化的几何模型计
+算所得出的观测矩阵不完全相同。为了验证所提算法的泛化性，方便直接用于其他病人模型
+的重建，在H矩阵中加入0dB（无噪声），30dB，40dB，50dB高斯白噪声。
+\autoref{fig:kfh_noise}展示了在H矩阵中加入高斯噪声的时序波形图。结合\autoref{tab:kfh_noise}
+,可以看到当加入30dB的高斯白噪声时，CC和SSIM的指标下降较大，但是随着噪声逐渐减小，CC和SSIM非常稳定。
+有理由推断出当在训练中加入更多的个性化转换矩阵可以减少噪声的
+影响，因此该算法具备良好的泛化性能。
+\begin{table}[]
+    \centering
+    \caption{在H矩阵中加入0dB（无噪声）、30dB、40dB、50dB高斯白噪声下重建的TMP与真值之间的CC、SSIM}
+    \begin{tabular}{ccc}
+    \Xhline{2pt}
+    \makebox[0.2\textwidth][c]{噪声(dB)} & \makebox[0.2\textwidth][c]{CC}   & \makebox[0.2\textwidth][c]{SSIM} \\ \hline
+    0      & 0.75 & 0.72 \\ 
+    30     & 0.60 & 0.58 \\ 
+    40     & 0.73 & 0.71 \\ 
+    50     & 0.74 & 0.71 \\ \Xhline{2pt}
+    \end{tabular}
+    \label{tab:kfh_noise}
+\end{table}
+
+% 本章的实验数据是基于临床病人的心脏-躯干模型仿真所得，不同病人的个性化的几何模型计
+% 算所得出的转换矩阵不完全相同，为了验证所提算法在不同模型上的泛化性，
+% 我们将我们的模型在另一个心脏模型上进行了测试，验证在不同心脏模型上实用性。图所示，我们
+% 的方法在重建细节和区域的边界上要优于其他的方法。
+% % \begin{figure}
+% %     \centering
+% %     \includegraphics[width=1\linewidth]{normal.png}
+% %     \caption{\label{fig:fig-placeholder}norm心脏模型图}
+% % \end{figure}
+
+% 在不同模型上的量化结果如表所示，我们的方法在CC和SSIM两项指标上超出其他的方法很多。
+
+\subsection{超参数设置分析}
+\begin{table}[]
+    \centering
+    \caption{损失函数系数分析表}
+    \begin{tabular}{ccc}
+    \Xhline{2pt}
+    \makebox[0.2\textwidth][c]{\(\alpha \)} & \makebox[0.2\textwidth][c]{CC}   & \makebox[0.2\textwidth][c]{SSIM} \\ \hline
+    0      & 0.67 & 0.66 \\ 
+    0.1     & 0.66 & 0.65 \\ 
+    0.5    & 0.70 & 0.65 \\ 
+    1     & 0.75 & 0.72 \\ 
+    2     & 0.65 & 0.71 \\ \Xhline{2pt}
+    \end{tabular}
+    \label{tab:kfcanshu}
+\end{table}
+
+在本文提出的KFNet中，本文设置的损失函数中包含了两个部分，一部分可以看做数据保真项，让结果靠近真值，第二项是
+为了训练状态转移网络，它们之间通过参数\(\alpha\)来平衡。
+在本章中本文讨论了不同参数\(\alpha\)下，本文提出方法的重建效果。参数的选择
+:0,0.1,0.5,1,2。从\autoref{tab:kfcanshu}中本文可以看到当\(\alpha=1\)时，CC和SSIM
+达到了最大值。
+\let\cleardoublepage\clearpage
+\chapter{基于图注意力的卡尔曼滤波深度学习框架}
+\section{心脏几何先验信息}
+
+TMP信号是分布在心脏的表面，从信号的属性看它是存在于非欧氏空间。目前主要重建TMP的方法都是在欧氏空间重建的，
+缺少非欧氏空间的几何信息。在第四章中本文提出基于循环神经网络的卡尔曼滤波算法，虽然解决了
+卡尔莫滤波中本本身存在的参数矩阵调节问题，但是本文只考虑了欧式空间的信息。
+在本章中，本文基于图卷积和注意力机制的方法，在网络结构中加入心脏几何信息先验，提出使用图空间注意力机制来自主学习心脏各个节点
+TMP的权重，提升本文第四章提出的的状态转移网络SSNet和KFNet的能力。
+\section{图注意力机制}
+\subsection{图卷积}
+图卷积神经网络就是在通过节点之间的关系构建图结构，然后再图上进行卷积运算的网络\cite{zhang2019graph}。
+最核心的是图卷积算子，下面是图卷积算子的公式：
+\begin{equation}
+    h_{i}^{l+1}=\sigma(\sum_{j\in N_i}\frac{1}{c_{ij}h_j^lw_{R_j}^l})
+\end{equation}
+其中，设中心点为\(i\)，\(h_i^l\)表示\(i\)在第\(l\)层的特征表达，\(c_{ij}\)表示归一化因子，比如去节点的倒数，
+\(N_i\)表示节点\(i\)的邻居，\(R_i\)表示\(i\)的类型，\(W_{R_i}^l\)表示第\(l\)层的变换权重参数。
+
+图卷积的过程可以分为三步:第一步：发射每一个节点，将自身的特征信息经过变换后发送给邻居节点。这一步是对节点的
+特征信息进行提取变换。第二步：接收每个节点，将邻居节点的特征信息聚集起来。这一步是在对节点的局部结构信息进行融合。
+第三步:把前面的信息聚集之后做非线性变换，增加模型的表达能力。以上三步是对图卷积神经网络初步的
+理解，其本质还是卷积的过程，只是将其应用在图结构数据上进行计算，因而对于不同的图结构，也有
+着不同的图卷积方式。
+
+目前图上的卷积定义基本上可以分为两类，一个是基于谱的图卷积，它们通过傅里叶变换将结点映射到
+频域空间，通过在频域空间上做乘积来实现时域上的卷积，最后再将做完乘积的特征映射回时域空间。而另
+一种是基于空间域的图卷积，这就和本文传统的CNN很像了，只不过在图结构上更难定义结点的邻居以及与
+邻居之间的关系。
+
+基于谱的图卷积主要利用的是图傅里叶变换(Graph Fourier Transform)实现卷积。简单来讲，
+它利用图的拉普拉斯矩阵(Laplacian matrix)导出其频域上的的拉普拉斯算子，再类比
+频域上的欧式空间中的卷积，导出图卷积的公式。其中涉及到大量的数学公式计算，感兴趣的同学可以自行搜索。
+
+基于空间域的图卷积与深度学习中的卷积的应用方式类似，其核心在于聚合邻居结点的信息。比如说，一种最简单的
+无参卷积方式可以是：将所有直连邻居结点的隐藏状态加和，来更新当前结点的隐藏状态。在本章中采用的图卷积方式
+是基于空域的图卷积。
+\subsection{注意力机制}
+注意力机制，其本质是一种通过网络自主学习出的一组权重系数，并
+以“动态加权”的方式来强调所感兴趣的区域同时抑制不相关背景
+区域的机制。在计算机视觉领域中，注意力机制可以大致分为两大类：
+强注意力和软注意力。由于强注意力是一种随机的预测，其强调的是动态
+变化，虽然效果不错，但由于不可微的性质导致其应用很受限制。与之相反
+的是，软注意力是处处可微的，即能够通过基于梯度下降法的神经网络训练所
+获得，因此其应用相对来说也比较广泛。软注意力按照不同维度（如通道、空
+间、时间、类别等）出发，目前主流的注意力机制可以分为以下三种：通道注
+意力、空间注意力以及自注意力\cite{niu2021review}。
+
+
+\subsection{基于空间信息的注意力模块}
+状态转移网路SSNet输出的是t时刻的先验状态，它仅仅是使用了GRU模拟了状态转移方程。SSNet在计算的过程中，输入层、隐藏层和输出
+层之间的都是在欧式空间计算的，网络没有记录心脏的空间信息。因此本文引入图卷积，将心脏的几何信息先验加入状态转移网络SSNet。
+本文使用图卷积学习心脏每个节点之间的权重，然后引入注意力机制，将权重和中间GRU输出的特征做融合，得到先验状态。
+
+本文通过建立心脏的有限元模型，构建心脏的图结构\(\mathcal{G}=(\mathcal{E},\mathcal{V})\)，\(\mathcal{E}\)
+代表心脏表面的节点，维度是N，\(\mathcal{V}\)表示顶点之间的边结构。
+\autoref{fig:ga}展示了基于空间信息的注意力机制模块GA的示意图。
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{gs.png}
+    \caption{\label{fig:ga}图注意力机制GA。绿色模块是图卷积网络。}
+\end{figure}
+% \begin{equation}
+%     \mathcal{U}_i = W_i * Y_i
+%     \label{eq:quanzhong}
+% \end{equation}
+其中，\(W_i\)表示通过四层图卷积得到的每个心脏节点的权重，\(Y_i\)表示GRU输出的网络中间特征。网络通过GRU学习
+TMP的时间关系，然后通过图卷积学习心脏每个节点的权重，从而使网络结合了非欧式空间的信息。
+
+整个网络的结构和第四章\autoref{fig:kf}所示的流程一样，损失函数的设置如公\autoref{eq:loss}所示。
+\autoref{fig:gassnet}展示了基于图注意力机制的状态转移网络GASSNet。
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{gcnssnet.png}
+    \caption{\label{fig:gassnet}基于图注意力机制的状态转移网络GASSNet}
+\end{figure}
+\section{实验验证}
+\subsection{实验设置}
+为了验证所提出的图注意力机制(GA)模块在重建TMP的效果，本文将
+从两个方面进行了实验验证。1、在心脏异位起搏、心肌梗死及激活时间上验证本文提出的图注意力机制；
+2、鲁棒性分析。
+本文提出的图注意力机制是否可以提升算法的抗噪声能力和泛化能力。
+本文将在四种方法进行对比实验：1、SSNet；2、GASSNet(SSNet+GA)；3、KFNet；4、GAKFNet(KFNet+GA)，
+并且计算各项方法重建的结果的评价指标。
+
+实验结果用三个评价指标来衡量:1)相关系数(CC):它描述了
+真值与预测结果之间的相关性;2)结构相似性
+(SSIM):它评估真实图像和重建图像之间的结构相似性;3)定位误差(LE):
+通过计算异位起搏点的欧几里得距离对定位精度进行评估。
+
+实验数据由ECGsim软件生成
+。共模拟15000组数据，同时包含异位起搏和心肌梗死。
+为了方便网络训练，本文以500帧为一个样本,并且将TMP放缩到-1到1，然后将处理之后的
+TMP乘以系统矩阵得到网络的输入。最终网络输入的shape是(500,64)。
+
+本章中的深度学习训练和测试都是在python3.8、pytorch1.10.0和dgl0.5.3下进行的，训练采用的显卡配是TITANRTX，显卡显存
+为24G。训练时的配置是：初始学习率为0.001，训练epoch为1000次，一次训练采用500帧TMP，优化器采用
+Adam优化器和SGD优化器混合训练。
+\subsection{异位起搏实验}
+为了验证本文提出的图注意力模块(GA)在提升重建TMP精度上的效果，本文在仿真数据上进行心脏异
+位起搏实验。
+\autoref{fig:gapvc}展示了SSNet、GASSNet、KFNet和GAKFnet四种方法重建的心脏异位起
+搏电压分布图，异位起搏的位置分别是右心室，右心室流出道和右心室间隔测。\autoref{fig:gapvc}的
+Case 1，SSNet的重建的起搏区域较为模糊，因为SSNet只有时间信息的先验；相比于SSNet，GASSNet
+增加了GA模块，让网络学习了心脏几何结构的先验信息，增加了图形结构的先验，明显提升了重建
+心脏起搏边缘的质量。同时可以看到\autoref{fig:gapvc}中的Case 3，GAKFNet和KFNet重建起搏区域的
+形状与真值相似，但是因为GAKFNet增加了心脏几何结构的先验信息，GAKFNet重建的结果在电压幅值上
+更加靠近真值，说明本文的GA模块可以通过给网络增加几何先验信息提升本文提出的KFNet重建心脏异位起搏
+的能力。
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{gakfpvc.png}
+    \caption{\label{fig:gapvc}SSNet，GASSNet，KFNet和GAKFNet四种不同方法重建心脏异位起搏电压分布图。红色代表心肌
+    细胞激活区域，蓝色代表的心肌细胞处于静息电位状态}
+\end{figure}
+\autoref{fig:gapvc}从视觉上帮助本文验证提出的方法在定位异位起搏的视觉效果，为了更加明确
+算法的精度，本文对SSNet、GASSNet、KFNet和GAKFNet重建结果在空间域计算了评价指标CC、SSIM和LE。\autoref{tab:gakfepdianya}展示了四种方法的
+评价指标
+，GASSNet与SSNet以及GAKFNet与KFNet相比，在指标CC、SSIM和LE上GASSNet都是提升的，
+
+
+\begin{table}
+    \centering
+    \caption{ SSNet，GASSNet，KFNet 和 GAKFNet四种不同方法重建心脏
+    异位起搏的TMP与真值之间的CC,SSIM和LE}
+    \begin{tabular}{cccc}
+    \Xhline{2pt}
+    \makebox[0.2\textwidth][c]{方法} & \makebox[0.2\textwidth][c]{CC}        & \makebox[0.2\textwidth][c]{SSIM}     & \makebox[0.2\textwidth][c]{LE}        \\ \hline
+    SSNet                      & 0.73 & 0.70 & 14.2 \\ 
+    GASSNet                            & 0.75 & 0.73 & 13.2 \\ 
+    KFNet                        & 0.78 & 0.77 & 10.1  \\ 
+    GAKFNet                         & 0.80 & 0.78 & 8.3  \\ \Xhline{2pt}
+    \end{tabular}
+    \label{tab:gakfepdianya}
+\end{table}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{gakfpvctime.png}
+    \caption{\label{fig:gaeptime}SSNet，GASSNet，KFNet 和 GAKFNet四种不同方法重建心脏异位起搏点的区域的波形图}
+\end{figure}
+TMP在心脏上是动态变化的，所以不仅要从空间域分析本文提出的GA模块的效果还要从时间域分析GA模块对重建心脏起搏区域波形的效果。
+\autoref{fig:gaeptime}展示了SSNet，GASSNet，KFNet 和 GAKFNet四种不同方法重建心脏异位起搏点的区域的波形图。四种方法都在TMP下降的阶段
+表现很好，但是在TMP完全激活时重建的效果存在明显差异。例如\autoref{fig:gaeptime}Case 1中，SSNet域GAKFNet相比，GAKFNet达到完全激活时更加稳定。
+例如\autoref{fig:gaeptime}Case 3中，GAKFNet与KFNet相比，GAKFNet在完全激活阶段更加稳定。所以从重建心脏异位起搏TMP的
+时序波形看，本文提出的GA模块有助于提升重建TMP的精度。
+
+\begin{table}[]
+    \centering
+    \caption{SSNet，GASSNet，KFNet 和 GAKFNet四种不同方法重建心脏
+    异位起搏区域的时序TMP与真值之间的CC,SSIM}
+    \begin{tabular}{ccc}
+    \Xhline{2pt}
+    \makebox[0.3\textwidth][c]{方法} & \makebox[0.3\textwidth][c]{CC}        & \makebox[0.3\textwidth][c]{SSIM}     \\ \hline
+    SSNet & 0.90 & 0.93 \\ 
+    GASSNet       & 0.93 & 0.96 \\ 
+    KFNet   & 0.96 & 0.98 \\ 
+    GAKFNet    & 0.97 & 0.98 \\ \Xhline{2pt}
+    \end{tabular}
+    \label{tab:gaeptime}
+\end{table}
+
+为了更加准确地从时序角度分析本文提出的GA模块对重建时序TMP的精度，本文计算了四种方法的评价指标，结果展示
+在\autoref{tab:gaeptime}。对比SSNet、GASSnet和KFNet、GAKFNet，表明GA模块可以提升重建时序TMP的
+精度。
+\subsection{心肌梗死实验}
+为了验证本文提出的图注意力模块(GA)在提升重建TMP精度上的效果，本文在仿真数据上进行心肌梗死。
+\autoref{fig:gami}展示了SSNet、GASSNet、KFNet和GAKFnet四种方法重建的心肌梗死电压分布图，
+心肌梗死的位置分别是右心室心肌壁，右心室上侧和右心室流出道。\autoref{fig:gami}的
+Case 1，SSNet重建的结果并不能看出心肌梗死的区域，但是因为加入GA模块，
+从GASSNet重建的结果可以看出心肌梗死的位置。
+GAKFNet与KFNet相比，在重建心肌梗死的边缘细节上取得更好的效果
+，说明本文的GA模块可以通过给网络增加几何先验信息提升本文提出的KFNet重建心肌梗死
+的能力。
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{gakfmi.png}
+    \caption{\label{fig:gami}SSNet，GASSNet，KFNet和GAKFNet四种不同方法重建心肌梗死电压分布图。红色代表心肌
+    细胞激活区域，蓝色代表梗死区域}
+\end{figure}
+\begin{table}[]
+    \centering
+    \caption{SSNet，GASSNet，KFNet 和 GAKFNet四种不同方法重建心肌梗死区域的TMP与真值之间的CC,SSIM}
+    \begin{tabular}{ccc}
+    \Xhline{2pt}
+    \makebox[0.3\textwidth][c]{方法} & \makebox[0.3\textwidth][c]{CC}        & \makebox[0.3\textwidth][c]{SSIM}     \\ \hline
+    SSNet & 0.67 & 0.65 \\ 
+    GASSNet       & 0.72 & 0.69 \\ 
+    KFNet   & 0.74 & 0.74 \\ 
+    GAKFNet    & 0.77 & 0.74 \\ \Xhline{2pt}
+    \end{tabular}
+    \label{tab:gami}
+\end{table}
+\autoref{fig:gami}从视觉上验证本文提出的方法在重建心脏梗死区域的视觉效果，为了更
+加明确算法的精度，本文对SSNet、GASSNet、KFNet 和 GAKFNet 重建心肌梗死的TMP在空间域计
+算了评价指标 CC、SSIM。\autoref{tab:gami}展示了四种方法的评价指标，GASSNet与SSNet
+以及GAKFNet与KFNet相比，在指标 CC、SSIM上GASSNet都是提升的。
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{gakfmitime.png}
+    \caption{\label{fig:gamitime}SSNet，GASSNet，KFNet和GAKFNet四种不同方法重建心肌梗死区域的时序TMP波形}
+\end{figure}
+
+本文从时序信号的波形的角度分析提出的GA模块对提升心肌梗死区域的TMP重建的精度。
+\autoref{fig:gaeptime}展示了SSNet，GASSNet，KFNet 和 GAKFNet四种不同方法重建心肌梗死区域的波
+形图。从图中本文可以看到，GAKFNet和GASSNet重建的时序波形相比于KFNet和SSNet更加符合真值。
+
+\begin{table}[]
+    \centering
+    \caption{SSNet，GASSNet，KFNet 和 GAKFNet四种不同方法重建心肌梗死区域的时序TMP与真值之间的CC,SSIM}
+    \begin{tabular}{ccc}
+    \Xhline{2pt}
+    \makebox[0.3\textwidth][c]{方法} & \makebox[0.3\textwidth][c]{CC}        & \makebox[0.3\textwidth][c]{SSIM}     \\ \hline
+    SSNet & 0.91 & 0.90 \\ 
+    GASSNet       & 0.93 & 0.90 \\ 
+    KFNet   & 0.96 & 0.97 \\ 
+    GAKFNet    & 0.98 & 0.99 \\ \Xhline{2pt}
+    \end{tabular}
+    \label{tab:gamitime}
+\end{table}
+为了更加准确地从时域分析GA模块对重建心肌梗死区域的效果，本文计算了四种方法的评价指标，结果展示
+在\autoref{tab:gamitime}。对比SSNet、GASSnet和KFNet、GAKFNet，表明GA模块可以提升重建时序TMP的
+精度。
+
+\subsection{激活时间实验}
+本小节将从重建心脏的激活时间分析GA模块对提升重建TMP的能力。\autoref{fig:gaac}展示了SSNet，GASSNet，KFNet和
+GAKFNet四种不同方法重建心脏的激活时间。在Case 1中，心脏从右心室心尖部位开始激活，电信号经过心肌细胞传导到右心室流出道，
+SSNet开始激活的区域不能明显看出大致位置，加了GA模块的GASSNet方法的重建结果可以看到开始激活的位置；KFNet可以看出激活
+传递的方向，但是在一些细节上还不是很清晰，在加了GA模块后，重建传递顺序更加清晰了。
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{gakfac.png}
+    \caption{\label{fig:gaac}SSNet，GASSNet，KFNet和GAKFNet四种不同方法重建心脏激活时间。蓝色代表最早激活时间，红色表示
+    最晚激活时间。}
+\end{figure}
+\begin{table}[]
+    \centering
+    \caption{SSNet，GASSNet，KFNet 和 GAKFNet四种不同方法重建心脏激活时间与真值之间的CC和SSIM}
+    \begin{tabular}{ccc}
+    \Xhline{2pt}
+    \makebox[0.3\textwidth][c]{方法} & \makebox[0.3\textwidth][c]{CC}        & \makebox[0.3\textwidth][c]{SSIM}     \\ \hline
+    SSNet & 0.50 & 0.55 \\ 
+    GASSNet       & 0.55 & 0.56 \\ 
+    KFNet   & 0.70 & 0.72 \\ 
+    GAKFNet    & 0.74 & 0.75 \\ \Xhline{2pt}
+    \end{tabular}
+    \label{tab:gaac}
+\end{table}
+\autoref{tab:gaac}展示了SSNet，GASSNet，KFNet 和 GAKFNet四种不同方法重建心脏激活时间与真值之间的CC和SSIM，根据
+表中的指标可以分析出，GA模块加入的心脏几何信息可以帮助算法提升心脏激活时间的重建能力，特别时在激活开始区域的传导顺序上。
+
+\subsection{鲁棒性分析}
+在实际临床中，由于设备等环境原因，体表信号必然存在高斯噪声，因此为了更加
+符合临床的研究，本文在BSP中加入0dB（无噪声）、10dB、15dB、20dB高斯白噪声。
+\autoref{fig:gatmpnoise}显示了在BSP中加入高斯噪声不同病例的第十号心脏节点的重建TMP时序波形，
+第一列是0dB，第二列是10dB，第三列是15dB，第四列是20dB。从图中可以看出，随着噪声的增大，本文提出的方法
+重建的效果变化较为稳定。
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{gakftmpnoise.png}
+    \caption{\label{fig:gatmpnoise}在BSP中加入0dB，10dB，15dB，20dB高斯白噪声下不同病例第十号心脏节点的TMP波形图}
+\end{figure}
+
+\begin{table}[]
+    \centering
+    \caption{在BSP中加入0dB（无噪声）、10dB、15dB、20dB高斯白噪声下GAKFNet重建的TMP与真值之间的CC、SSIM}
+    \begin{tabular}{ccc}
+    \Xhline{2pt}
+    \makebox[0.2\textwidth][c]{噪声(dB)} & \makebox[0.2\textwidth][c]{CC}   & \makebox[0.2\textwidth][c]{SSIM} \\ \hline
+    0      & 0.79 & 0.78 \\ 
+    10     & 0.74 & 0.72 \\ 
+    15     & 0.77 & 0.76 \\ 
+    20     & 0.79 & 0.77 \\ \Xhline{2pt}
+    \end{tabular}
+    \label{tab:gatmpnoise}
+\end{table}
+
+\chapter{总结和未来展望}
+\section{本文工作总结}
+本文研究内容的重点在于无创电生理成像中心脏跨膜电位重建，基于这个内容本文提出了结合深度学习和卡尔曼滤波
+的深度学习框架，并且在这个框架下进一步提出结合图卷积和注意力机制的图注意力模块将
+心脏的几何
+先验信息融入到网络中，提升本文提出的框架重建TMP的能力。
+
+文章在第一章中介绍了无创电生理成像出现的原因，心脏电生理基础和和本文课题要面临和解决的
+科学问题。在第二章中本文对目前课题的研究背景和TMP的重建现状进行了详细的
+介绍。本文分别介绍了TMP动态模型和TMP正向模型，然后
+介绍了目前重建TMP的方法主要分为三大类：1、基于数学模型的迭代优化；2、
+基于数据驱动的深度学习方法；3、基于数学模型的深度学习方法。然后本文举例介绍了基于迭代正则化的\(L_p\)范数正则化，和基于数据融合的
+时序迭代方法，分析这种方法存在手动定义参数的问题，不利于临床应用。本文介绍了基于贝叶斯原理的变分自编码网络和基于
+图卷积的变分自编码网络，分析这种方法存在依赖大量数据，并且数学上存在不可解释性。结合前两者的缺点引出第三种
+基于数学模型的深度学习方法。文章在第三章中介绍了本文实验仿真数据的来源和心电正向研究。
+
+文章在第四章提出了结合深度学习和卡尔曼滤波算法的深度学习框架，从贝叶斯滤波推导出卡尔曼滤波的公式。本文提出
+通过循环神经网络学习状态转移方程
+，通过卷积神经网络学习卡尔曼增益系数，避免了传统卡尔曼滤波算法需要调节噪声矩阵的缺点。本文在仿真数据进行了
+三个方面的实验：1、从临床的应用证明本文提出的方法相对于Tikhonov、TV和VAE的优势；2、进行消融实验验证了本文提出的
+通过深度学习得到卡尔曼增益系数的合理性；3、从算法的鲁棒性和泛化性分析算法具有鲁棒性和泛化性。
+
+
+文章第五章在第四章的基础上进一步提出图注意力模块，在状态转移网络SSNet中增加图注意力模块。图注意力模块
+通过图卷积学习心脏各个节点的权重，然后通过注意力机制强调SSNet中各个心脏节点的特征。本文在仿真数据上进行了
+两组实验：1、从临床应用的角度分析第五章提出的模块对第四章提出的算法重建TMP效果的提升；2、从算法的鲁班性分析算法的
+稳定性。
+
+
+\section{未来展望}
+本篇文章的研究内容的临床意义是在帮助医生通过无创电生理成像的方法重建心脏跨膜电位，协助医生定位心脏的异位起搏和
+心肌梗死的区域和手术之后的辅助治疗。但是目前的研究方向仍然存在两处可以改进的地方，希望可以在之后的研究中和其他研究者
+共同突破这三个难点：
+
+(1)目前算法是从64导联体表电信号重建心脏跨膜电位，但是在临床中64导联采集的设置非常昂贵，并且采集过程的操作
+复杂，目前医生日常诊断使用的是12导联心电图，数据量大并且操作简单。希望之后可以利用体表12导联心电图重建出心脏跨膜电位，
+虽然这里面蕴含逆问题更强的病态性，但是应用前景相比64导联更加广阔。
+
+(2)目前本文建立的心脏躯干模型都是针对特异性个体的，对于每一个病人个体都需要对病人进行CT扫描，以此建立不同的
+心脏躯干结构，求解TMP的正向模型。希望在以后的研究中可以建立统一的心脏躯干模型，增强模型的泛化能力。
+
+(3)本文提出的学习状态转移方程的SSNet是模拟心脏跨膜电位的时序关系，为了更加符合心脏电生理特性，希望在以后的
+研究中研究者可以根据双变量模型，使用深度学习的方法学习物理模型本身的生理参数，增加模型的可解释性。
+
+% 如果你在Overleaf上编译本模板，请注意如下事项：
+ 
+% \begin{itemize}
+%     \item 删除根目录的 ``.latexmkrc'' 文件，否则编译失败且不报任何错误
+%     \item 字体有版权所以本模板不能附带字体，请务必手动上传字体文件，并在各个专业模板下手动指定字体。
+%         具体方法参照 GitHub 主页的说明。
+%     \item 当前的Overleaf默认使用TexLive 2017进行编译，但一些伪粗体复制乱码的问题需要TexLive 2019版本来解决。
+%         所以各位同学可以在Overleaf上编写论文时务必切换到TexLive 2019或更新版本来编译，以免产生查重相关问题。
+%         具体说明参照 GitHub 主页。
+% \end{itemize}
+
+
+% \section{节标题}
+
+% 我们可以用includegraphics来插入现有的jpg等格式的图片，
+% 如\autoref{fig:zju-logo}所示。
+
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=.3\linewidth]{logo/zju}
+%     \caption{\label{fig:zju-logo}浙江大学LOGO}
+% \end{figure}
+
+
+% \subsection{小节标题}
+
+
+% \par 如\autoref{tab:sample}所示，这是一张自动调节列宽的表格。
+
+% \begin{table}[htbp]
+%     \caption{\label{tab:sample}自动调节列宽的表格}
+%     \begin{tabularx}{\linewidth}{c|X<{\centering}}
+%         \hline
+%         第一列 & 第二列 \\ \hline
+%         xxx & xxx \\ \hline
+%         xxx & xxx \\ \hline
+%         xxx & xxx \\ \hline
+%     \end{tabularx}
+% \end{table}
+
+
+% \par 如\autoref{equ:sample}，这是一个公式
+
+% \begin{equation}
+%     \label{equ:sample}
+%     A=\overbrace{(a+b+c)+\underbrace{i(d+e+f)}_{\text{虚数}}}^{\text{复数}}
+% \end{equation}
+
+% \chapter{另一章}
+
+
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=.3\linewidth]{example-image-a}
+%     \caption{\label{fig:fig-placeholder}图片占位符}
+% \end{figure}
+
+% \chapter{再一章}
+
+% \par 如\autoref{alg:sample}，这是一个算法
+
+% \begin{algorithm}[H]
+%     \begin{algorithmic} % enter the algorithmic environment
+%         \REQUIRE $n \geq 0 \vee x \neq 0$
+%         \ENSURE $y = x^n$
+%         \STATE $y \Leftarrow 1$
+%         \IF{$n < 0$}
+%             \STATE $X \Leftarrow 1 / x$
+%             \STATE $N \Leftarrow -n$
+%         \ELSE
+%             \STATE $X \Leftarrow x$
+%             \STATE $N \Leftarrow n$
+%         \ENDIF
+%         \WHILE{$N \neq 0$}
+%             \IF{$N$ is even}
+%                 \STATE $X \Leftarrow X \times X$
+%                 \STATE $N \Leftarrow N / 2$
+%             \ELSE[$N$ is odd]
+%                 \STATE $y \Leftarrow y \times X$
+%                 \STATE $N \Leftarrow N - 1$
+%             \ENDIF
+%         \ENDWHILE
+%     \end{algorithmic}
+%     \caption{\label{alg:sample}算法样例}
+% \end{algorithm}
